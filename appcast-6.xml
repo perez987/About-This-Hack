@@ -2,16 +2,16 @@
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
     <channel>   
        <item>
-            <title>Version 5.0.6</title>
+            <title>Version 5.0.7</title>
             <description></description>
-            <sparkle:version>1656</sparkle:version>
-            <sparkle:shortVersionString>5.0.6</sparkle:shortVersionString>
+            <sparkle:version>1657</sparkle:version>
+            <sparkle:shortVersionString>5.0.7</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>15.6</sparkle:minimumSystemVersion>
             <pubDate>Sat, 28 Mar 2026 21:24:31 +0000</pubDate>
             <enclosure
-                url="https://github.com/perez987/About-This-Hack/releases/download/5.0.6/About.This.Hack.5.0.6.dmg"
-                length="7197996"
-                sparkle:edSignature="3OxLLUQgCbTgbajQ73swivvsnl8UbpmWewedr071xCFVF4Y0fhnFa26Vmu2b/XpOcl5Gnr7YaHj2gPvsbAFRDA=="
+                url="https://github.com/perez987/About-This-Hack/releases/download/5.0.7/About.This.Hack.5.0.7.dmg"
+                length="7835795"
+                sparkle:edSignature="n2BPzPmGhvx/5XkLo36zp2cAV83JdyZJK2N3gESZEn+uT0yQp443OdxXauXSwQWrvP2rVxCJp5q8X5rvYN5+Aw=="
                 type="application/octet-stream"
             />
         </item>
