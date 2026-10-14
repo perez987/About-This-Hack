@@ -52,49 +52,75 @@ class CreateDataFiles {
         }
     }
 
-    static func getInitDataFiles() {
-        if dataFilesState.get() {
-            return
-        }
+    private static let directoryLock = NSLock()
+    private nonisolated(unsafe) static var directoryPrepared = false
+
+    /// Removes any stale data directory and recreates it once per launch.
+    private static func prepareDirectory() {
+        directoryLock.lock()
+        defer { directoryLock.unlock() }
+        guard !directoryPrepared else { return }
+        directoryPrepared = true
 
         let fm = FileManager.default
         let athURL = URL(fileURLWithPath: InitGlobVar.athDirectory, isDirectory: true)
-
-        // Remove any stale directory and recreate it fresh
         try? fm.removeItem(at: athURL)
         do {
             try fm.createDirectory(at: athURL, withIntermediateDirectories: true)
         } catch {
             print("Error: could not create temp directory \(athURL.path): \(error)")
         }
+    }
 
-        // /* Product phase  - Uncomment for product phase
-        // Use DispatchGroup to run all commands in parallel
+    /// Fast reports the Overview needs beyond native APIs (memory type/speed and
+    /// Clover detection). Creating them first lets the Overview appear with final values.
+    private static let overviewCommands: [(path: String, command: String)] = [
+        (InitGlobVar.sysmemFilePath, "system_profiler SPMemoryDataType 2>/dev/null | grep -v \"^Memory:$\" > \"\(InitGlobVar.sysmemFilePath)\""),
+        (InitGlobVar.hwFilePath, "system_profiler SPHardwareDataType 2>/dev/null > \"\(InitGlobVar.hwFilePath)\""),
+    ]
+
+    /// Note: scrXmlFilePath and syssoftdataFilePath removed - they were never used in the codebase
+    /// Note: SPDisplaysDataType is run directly (without a file) in HardwareCollector.getAllData()
+    private static let detailCommands: [(path: String, command: String)] = [
+        (InitGlobVar.bootvolnameFilePath, "diskutil info / 2>/dev/null > \"\(InitGlobVar.bootvolnameFilePath)\""),
+        (InitGlobVar.bootvollistFilePath, "diskutil list / 2>/dev/null > \"\(InitGlobVar.bootvollistFilePath)\""),
+        (InitGlobVar.storagedataFilePath, "system_profiler SPStorageDataType 2>/dev/null > \"\(InitGlobVar.storagedataFilePath)\""),
+    ]
+
+    private static func fileHasContent(_ path: String) -> Bool {
+        let size = (try? FileManager.default.attributesOfItem(atPath: path)[.size] as? NSNumber)?.intValue ?? 0
+        return size > 0
+    }
+
+    /// Runs the commands whose output files do not exist yet, concurrently, and waits for them.
+    private static func runMissing(_ entries: [(path: String, command: String)]) {
+        prepareDirectory()
         let group = DispatchGroup()
         let queue = DispatchQueue.global(qos: .userInitiated)
-
-        // Define all file creation commands
-        // Note: scrXmlFilePath and syssoftdataFilePath removed - they were never used in the codebase
-        // Note: SPDisplaysDataType is run directly (without a file) in HardwareCollector.getAllData()
-        let commands = [
-            "system_profiler SPHardwareDataType 2>/dev/null > \"\(InitGlobVar.hwFilePath)\"",
-            "system_profiler SPMemoryDataType 2>/dev/null | grep -v \"^Memory:$\" > \"\(InitGlobVar.sysmemFilePath)\"",
-            "diskutil info / 2>/dev/null > \"\(InitGlobVar.bootvolnameFilePath)\"",
-            "diskutil list / 2>/dev/null > \"\(InitGlobVar.bootvollistFilePath)\"",
-            "system_profiler SPStorageDataType 2>/dev/null > \"\(InitGlobVar.storagedataFilePath)\"",
-        ]
-
-        // Execute all commands concurrently
-        for command in commands {
+        for entry in entries where !fileHasContent(entry.path) {
+            let command = entry.command
             group.enter()
             queue.async {
                 _ = run(command)
                 group.leave()
             }
         }
-
-        // Wait for all commands to complete (this is called from a background thread in getInitDataFilesAsync).
         group.wait()
+    }
+
+    /// Creates only the fast reports needed by the Overview tab.
+    static func createOverviewDataFiles() {
+        runMissing(overviewCommands)
+    }
+
+    static func getInitDataFiles() {
+        if dataFilesState.get() {
+            return
+        }
+
+        // /* Product phase  - Uncomment for product phase
+        // Run all commands in parallel; reports already created for the Overview are reused.
+        runMissing(overviewCommands + detailCommands)
         print("Data files created")
         // */
 

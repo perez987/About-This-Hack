@@ -9,12 +9,11 @@ final class HCCPU: @unchecked Sendable {
     static let shared = HCCPU()
     private init() {}
 
-    private lazy var cpuInfo: (brand: String, details: String, coreCount: Int, isAppleSilicon: Bool) = {
+    private lazy var cpuInfo: (brand: String, coreCount: Int, isAppleSilicon: Bool) = {
         let brand = getSysctlValueByKey(inputKey: "machdep.cpu.brand_string")?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "Unknown CPU"
         let isAppleSilicon = brand.hasPrefix("Apple")
         let coreCount = isAppleSilicon ? getAppleSiliconCoreCount() : getCPUCoreCount()
-        let details = getCPUDetails(isAppleSilicon: isAppleSilicon, coreCount: coreCount)
-        return (brand, details, coreCount, isAppleSilicon)
+        return (brand, coreCount, isAppleSilicon)
     }()
 
     func getCPU() -> String {
@@ -35,7 +34,7 @@ final class HCCPU: @unchecked Sendable {
     }
 
     func getCPUInfo() -> String {
-        cpuInfo.details
+        getCPUDetails(isAppleSilicon: cpuInfo.isAppleSilicon, coreCount: cpuInfo.coreCount)
     }
 
     func getCPUCoreCount() -> Int {
@@ -43,35 +42,19 @@ final class HCCPU: @unchecked Sendable {
         var size = MemoryLayout<UInt32>.size
         let result = sysctlbyname("hw.packages", &count, &size, nil, 0)
 
-        if result == 0 {
+        if result == 0, count > 0 {
             return Int(count)
         } else {
             print("Warning: Failed to get physical CPU count via hw.packages: \(String(cString: strerror(errno)))")
-            // Fallback or alternative method can be added here if needed
-            // For now, let's try hw.physicalcpu
-            var physicalCPU: UInt32 = 0
-            var sizePhysical = MemoryLayout<UInt32>.size
-            if sysctlbyname("hw.physicalcpu", &physicalCPU, &sizePhysical, nil, 0) == 0 {
-                return Int(physicalCPU)
-            } else {
-                print("Warning: Failed to get physical CPU count via hw.physicalcpu: \(String(cString: strerror(errno)))")
-            }
-            // And hw.logicalcpu as another fallback
-            var logicalCPU: UInt32 = 0
-            var sizeLogical = MemoryLayout<UInt32>.size
-            if sysctlbyname("hw.logicalcpu", &logicalCPU, &sizeLogical, nil, 0) == 0 {
-                return Int(logicalCPU)
-            } else {
-                print("Error: Failed to get any CPU count: \(String(cString: strerror(errno)))")
-            }
-            return -1
+            // Core/thread counts are not socket counts; don't invent an Nx label.
+            return 1
         }
     }
 
     private func getAppleSiliconCoreCount() -> Int {
         var count: UInt32 = 0
         var size = MemoryLayout<UInt32>.size
-        if sysctlbyname("machdep.cpu.core_count", &count, &size, nil, 0) == 0 {
+        if sysctlbyname("hw.physicalcpu", &count, &size, nil, 0) == 0 {
             return Int(count)
         }
         return getCPUCoreCount()

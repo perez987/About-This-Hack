@@ -6,6 +6,7 @@
 //
 
 import AppKit
+import IOKit
 import SwiftUI
 
 // MARK: - Overview View
@@ -39,6 +40,11 @@ struct OverviewView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .onReceive(NotificationCenter.default.publisher(for: .customLogoDidChange)) { _ in
             viewModel.reloadLogo()
+        }
+        .onReceive(appState.$overviewData) { snapshot in
+            if let snapshot {
+                viewModel.snapshot = snapshot
+            }
         }
     }
 
@@ -197,66 +203,183 @@ private struct SerialRow: View {
 
 // MARK: - View Model
 
+/// Value-only snapshots keep SwiftUI away from collectors while background loading mutates them.
+struct OverviewSnapshot {
+    var osFullName = ""
+    var systemVersion = ""
+    var macModel = ""
+    var cpu = ""
+    var ram = ""
+    var graphics = ""
+    var display = ""
+    var startupDisk = ""
+    var serialNumber = ""
+    var bootloader = ""
+    var osVersionTooltip = ""
+    var macModelTooltip = ""
+    var cpuTooltip = ""
+    var ramTooltip = ""
+    var graphicsTooltip = ""
+    var displayTooltip = ""
+    var startupDiskTooltip = ""
+    var serialTooltip = ""
+    var bootloaderTooltip = ""
+    var systemReportButtonTooltip = ""
+    var softwareUpdateButtonTooltip = ""
+
+    @MainActor
+    static func screenSummary() -> String {
+        guard let screen = NSScreen.screens.first else { return "⎯" }
+        // Use logical dimensions, matching the existing "UI Looks like" preference.
+        return "\(screen.localizedName) (\(Int(screen.frame.width)) x \(Int(screen.frame.height)))"
+    }
+
+    static func initial(displaySummary: String) -> OverviewSnapshot {
+        HCVersion.shared.getVersion()
+        HCMacModel.shared.getMacModel()
+
+        var snapshot = OverviewSnapshot()
+        snapshot.osFullName = "\(HCVersion.shared.osPrefix) \(HCVersion.shared.osName)"
+        snapshot.systemVersion = "\(HCVersion.shared.osNumber) (\(HCVersion.shared.osBuildNumber))"
+        let name = HCMacModel.shared.macName
+        let fullModel = "\(name) - \(HCMacModel.shared.getModelIdentifier())"
+        snapshot.macModel = fullModel.count > 60 ? name : fullModel
+        snapshot.cpu = HCCPU.shared.getCPU()
+        // Memory needs only the fast SPMemoryDataType report (created before this call).
+        // Graphics and Display come from native APIs, as upstream. These are the final
+        // values, so the rows never change after first appearance.
+        snapshot.ram = HCRAM.shared.getRam()
+        snapshot.graphics = HCGPU.shared.getNativeGPU() ?? "⎯"
+        snapshot.display = displaySummary
+        let volume = try? URL(fileURLWithPath: "/").resourceValues(forKeys: [.volumeNameKey])
+        snapshot.startupDisk = volume?.volumeName?.nilIfEmpty ?? "⎯"
+        let platform = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("IOPlatformExpertDevice"))
+        defer { if platform != 0 { IOObjectRelease(platform) } }
+        snapshot.serialNumber = HCSerialNumber.shared.getSerialNumber().nilIfEmpty
+            ?? registryString(platform, kIOPlatformSerialNumberKey) ?? ""
+        // The SPHardwareDataType report (needed for Clover) exists before this call.
+        snapshot.bootloader = HCBootloader.shared.getBootloader()
+        snapshot.systemReportButtonTooltip = Tooltips.shared.btSysInfotoolTip
+        snapshot.softwareUpdateButtonTooltip = Tooltips.shared.btSoftUpdtoolTip
+        return snapshot
+    }
+
+    static func detailed(from initial: OverviewSnapshot) -> OverviewSnapshot {
+        var snapshot = initial
+        // Memory, Graphics and Display keep their first-paint values. system_profiler
+        // is only used for GPUs that Metal does not expose.
+        if HCGPU.shared.getNativeGPU() == nil {
+            snapshot.graphics = HCGPU.shared.getGPU().nilIfEmpty ?? initial.graphics
+        }
+        snapshot.startupDisk = HCStartupDisk.shared.getStartupDisk().nilIfEmpty ?? initial.startupDisk
+
+        let t = Tooltips.shared
+        snapshot.osVersionTooltip = t.osVersiontoolTip
+        snapshot.macModelTooltip = t.macModeltoolTip
+        snapshot.cpuTooltip = t.cputoolTip
+        snapshot.ramTooltip = t.ramtoolTip
+        snapshot.graphicsTooltip = t.graphicstoolTip
+        snapshot.displayTooltip = t.displaytoolTip
+        snapshot.startupDiskTooltip = t.startupDisktoolTip
+        snapshot.serialTooltip = t.serialToggletoolTip
+        snapshot.bootloaderTooltip = t.blVersiontoolTip
+        return snapshot
+    }
+}
+
 class OverviewViewModel: ObservableObject {
     @Published var logoImage: NSImage = .init()
     @Published var isSerialHidden: Bool = true
+    @Published var snapshot: OverviewSnapshot
 
-    let osFullName: String
-    let systemVersion: String
-    let macModel: String
-    let cpu: String
-    let ram: String
-    let graphics: String
-    let display: String
-    let startupDisk: String
-    let serialNumber: String
-    let bootloader: String
+    var osFullName: String {
+        snapshot.osFullName
+    }
 
-    let osVersionTooltip: String
-    let macModelTooltip: String
-    let cpuTooltip: String
-    let ramTooltip: String
-    let graphicsTooltip: String
-    let displayTooltip: String
-    let startupDiskTooltip: String
-    let serialTooltip: String
-    let bootloaderTooltip: String
-    let systemReportButtonTooltip: String
-    let softwareUpdateButtonTooltip: String
+    var systemVersion: String {
+        snapshot.systemVersion
+    }
+
+    var macModel: String {
+        snapshot.macModel
+    }
+
+    var cpu: String {
+        snapshot.cpu
+    }
+
+    var ram: String {
+        snapshot.ram
+    }
+
+    var graphics: String {
+        snapshot.graphics
+    }
+
+    var display: String {
+        snapshot.display
+    }
+
+    var startupDisk: String {
+        snapshot.startupDisk
+    }
+
+    var serialNumber: String {
+        snapshot.serialNumber
+    }
+
+    var bootloader: String {
+        snapshot.bootloader
+    }
+
+    var osVersionTooltip: String {
+        snapshot.osVersionTooltip
+    }
+
+    var macModelTooltip: String {
+        snapshot.macModelTooltip
+    }
+
+    var cpuTooltip: String {
+        snapshot.cpuTooltip
+    }
+
+    var ramTooltip: String {
+        snapshot.ramTooltip
+    }
+
+    var graphicsTooltip: String {
+        snapshot.graphicsTooltip
+    }
+
+    var displayTooltip: String {
+        snapshot.displayTooltip
+    }
+
+    var startupDiskTooltip: String {
+        snapshot.startupDiskTooltip
+    }
+
+    var serialTooltip: String {
+        snapshot.serialTooltip
+    }
+
+    var bootloaderTooltip: String {
+        snapshot.bootloaderTooltip
+    }
+
+    var systemReportButtonTooltip: String {
+        snapshot.systemReportButtonTooltip
+    }
+
+    var softwareUpdateButtonTooltip: String {
+        snapshot.softwareUpdateButtonTooltip
+    }
 
     private let defaults = UserDefaults.standard
 
     init() {
-        let t = Tooltips.shared
-
-        osFullName = "\(HCVersion.shared.osPrefix) \(HCVersion.shared.osName)"
-        systemVersion = "\(HCVersion.shared.osNumber) (\(HCVersion.shared.osBuildNumber))"
-
-        let macName = HCMacModel.shared.macName
-        let modelID = HCMacModel.shared.getModelIdentifier()
-        let fullModel = "\(macName) - \(modelID)"
-        macModel = fullModel.count > 60 ? macName : fullModel
-
-        cpu = HCCPU.shared.getCPU()
-        ram = HCRAM.shared.getRam()
-        graphics = HCGPU.shared.getGPU()
-        display = HCDisplay.shared.getDisp()
-        startupDisk = HCStartupDisk.shared.getStartupDisk()
-        serialNumber = HCSerialNumber.shared.getSerialNumber()
-        bootloader = HCBootloader.shared.getBootloader()
-
-        osVersionTooltip = t.osVersiontoolTip
-        macModelTooltip = t.macModeltoolTip
-        cpuTooltip = t.cputoolTip
-        ramTooltip = t.ramtoolTip
-        graphicsTooltip = t.graphicstoolTip
-        displayTooltip = t.displaytoolTip
-        startupDiskTooltip = t.startupDisktoolTip
-        serialTooltip = t.serialToggletoolTip
-        bootloaderTooltip = t.blVersiontoolTip
-        systemReportButtonTooltip = t.btSysInfotoolTip
-        softwareUpdateButtonTooltip = t.btSoftUpdtoolTip
-
+        snapshot = AppState.shared.overviewData ?? OverviewSnapshot()
         reloadLogo()
     }
 

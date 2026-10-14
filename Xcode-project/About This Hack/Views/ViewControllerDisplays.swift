@@ -317,6 +317,8 @@ extension DisplaysViewModel {
 
     // MARK: - OS Version Mapping
 
+    // Commented out since it enlarges the app build too much
+
     private static func genericImacImageNameForCurrentOS() -> String {
 //        switch HCVersion.shared.osVersion {
 //        case .bigSur:

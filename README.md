@@ -33,6 +33,7 @@ Some will like it, some won't, and many others would have done it differently (p
 - Main version has opaque windows, but there is a version with translucent windows (`About This Hack-glass`)
 - Add audio tab with audio information (work in progress)
 - App is certified by Apple.
+- Faster first data display, adapted from upstream [commit 064d609](https://github.com/2009-Nissan-Cube/About-This-Hack/commit/064d609c770aca619aad05ddc0ba05813ef1945a): the Overview appears from native macOS APIs without waiting for `system_profiler`. Detailed RAM/GPU information, tooltips, and audio detection fill in afterward on a background thread. Displays and Storage show a loading indicator if opened before their reports are ready; the Audio tab appears after detection. GPUs not exposed by Metal and bootloaders requiring fallback detection may briefly show a dash.
 
 You can read about the migration process in [AppKit-XIB to SwiftUI](DOCS/AppKit-XIB-to-SwiftUI.md).
 

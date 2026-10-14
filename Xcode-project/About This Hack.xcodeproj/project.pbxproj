@@ -60,7 +60,7 @@
 
 /* Begin PBXFileReference section */
 		114545F52710E3AE0017655D /* Shell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Shell.swift; sourceTree = "<group>"; };
-		115D920E26D6F65500F5DF35 /* About This Hack.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "About This Hack.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		115D920E26D6F65500F5DF35 /* About This Hack-glass.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "About This Hack-glass.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		115D921126D6F65500F5DF35 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		115D921326D6F65500F5DF35 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		115D921526D6F65600F5DF35 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -128,7 +128,7 @@
 		115D920F26D6F65500F5DF35 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				115D920E26D6F65500F5DF35 /* About This Hack.app */,
+				115D920E26D6F65500F5DF35 /* About This Hack-glass.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -219,9 +219,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		115D920D26D6F65500F5DF35 /* About This Hack */ = {
+		115D920D26D6F65500F5DF35 /* About This Hack-glass */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 115D921E26D6F65600F5DF35 /* Build configuration list for PBXNativeTarget "About This Hack" */;
+			buildConfigurationList = 115D921E26D6F65600F5DF35 /* Build configuration list for PBXNativeTarget "About This Hack-glass" */;
 			buildPhases = (
 				115D920A26D6F65500F5DF35 /* Sources */,
 				115D920B26D6F65500F5DF35 /* Frameworks */,
@@ -232,12 +232,12 @@
 			);
 			dependencies = (
 			);
-			name = "About This Hack";
+			name = "About This Hack-glass";
 			packageProductDependencies = (
 				D9A1F94A301CFEDB00CAC1F6 /* Sparkle */,
 			);
 			productName = "About This Hack";
-			productReference = 115D920E26D6F65500F5DF35 /* About This Hack.app */;
+			productReference = 115D920E26D6F65500F5DF35 /* About This Hack-glass.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -277,7 +277,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				115D920D26D6F65500F5DF35 /* About This Hack */,
+				115D920D26D6F65500F5DF35 /* About This Hack-glass */,
 			);
 		};
 /* End PBXProject section */
@@ -494,7 +494,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1656;
+				CURRENT_PROJECT_VERSION = 1657;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = ER43ZD2S4U;
 				ENABLE_APP_SANDBOX = NO;
@@ -511,7 +511,7 @@
 					"$(SDKROOT)/usr/lib/swift",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 5.0.6;
+				MARKETING_VERSION = 5.0.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.0xCUBE.About-This-Hack";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -532,7 +532,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1656;
+				CURRENT_PROJECT_VERSION = 1657;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = ER43ZD2S4U;
 				ENABLE_APP_SANDBOX = NO;
@@ -549,7 +549,7 @@
 					"$(SDKROOT)/usr/lib/swift",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 5.0.6;
+				MARKETING_VERSION = 5.0.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.0xCUBE.About-This-Hack";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -570,7 +570,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		115D921E26D6F65600F5DF35 /* Build configuration list for PBXNativeTarget "About This Hack" */ = {
+		115D921E26D6F65600F5DF35 /* Build configuration list for PBXNativeTarget "About This Hack-glass" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				115D921F26D6F65600F5DF35 /* Debug */,

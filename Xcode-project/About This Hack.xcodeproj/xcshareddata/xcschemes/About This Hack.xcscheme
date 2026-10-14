@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "115D920D26D6F65500F5DF35"
-               BuildableName = "About This Hack.app"
-               BlueprintName = "About This Hack"
+               BuildableName = "About This Hack-glass.app"
+               BlueprintName = "About This Hack-glass"
                ReferencedContainer = "container:About This Hack.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -45,8 +45,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "115D920D26D6F65500F5DF35"
-            BuildableName = "About This Hack.app"
-            BlueprintName = "About This Hack"
+            BuildableName = "About This Hack-glass.app"
+            BlueprintName = "About This Hack-glass"
             ReferencedContainer = "container:About This Hack.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -69,8 +69,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "115D920D26D6F65500F5DF35"
-            BuildableName = "About This Hack.app"
-            BlueprintName = "About This Hack"
+            BuildableName = "About This Hack-glass.app"
+            BlueprintName = "About This Hack-glass"
             ReferencedContainer = "container:About This Hack.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

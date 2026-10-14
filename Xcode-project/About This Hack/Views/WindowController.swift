@@ -83,11 +83,12 @@ class AppState: ObservableObject {
     }
 
     @Published var isSidebarVisible: Bool = true
+    @Published private(set) var overviewData: OverviewSnapshot?
 
     /// True when audio codec data is available. Evaluated lazily after data loads.
-    /// Returns true during loading so the tab is not prematurely hidden.
+    /// Unavailable until audio detection has finished on the background thread.
     var hasAudioData: Bool {
-        guard isDataLoaded else { return true }
+        guard isDataLoaded else { return false }
         let info = HCAudio.shared.getAudioInfo()
         return !info.vendorName.isEmpty || !info.codecName.isEmpty || !info.layoutId.isEmpty
     }
@@ -100,9 +101,9 @@ class AppState: ObservableObject {
     }
 
     /// True when running on a Hackintosh (OpenCore without OCLP, or Clover).
-    /// Returns true during loading so the audio tab is not prematurely hidden.
+    /// Unavailable until bootloader and audio detection have finished.
     var isHackintosh: Bool {
-        guard isDataLoaded else { return true }
+        guard isDataLoaded else { return false }
         let bootloader = HCBootloader.shared.getBootloader().trimmingCharacters(in: .whitespacesAndNewlines)
         let normalizedBootloader = bootloader.lowercased()
 
@@ -141,9 +142,9 @@ class AppState: ObservableObject {
     /// or with a USB, HDMI, or DisplayPort audio device set as the default output.
     /// Hidden on real Macs and on Hackintoshes where none of these are active
     /// (or when VoodooHDA is active but getdump is not installed).
-    /// Returns true during loading so the tab is not prematurely hidden.
+    /// Hidden until background detection finishes, avoiding main-thread shell calls.
     var shouldShowAudioTab: Bool {
-        guard isDataLoaded else { return true }
+        guard isDataLoaded else { return false }
         guard isHackintosh else { return false }
         let driver = HCAudio.shared.getAudioInfo().driver
         return AppState.hackintoshAudioDrivers.contains(driver)
@@ -151,34 +152,41 @@ class AppState: ObservableObject {
 
     private let defaults = UserDefaults.standard
     private let windowFrameKey = "MainWindowFrame"
-    private var dataFilesToken: NSObjectProtocol?
+    private var didStartLoading = false
+    private init() {}
 
-    private init() {
-        // Use block-based observer to avoid @objc on a non-NSObject class.
-        dataFilesToken = NotificationCenter.default.addObserver(
-            forName: CreateDataFiles.dataFilesCreatedNotification,
-            object: nil,
-            queue: nil
-        ) { _ in
-            AppState.shared.loadDataAsync()
-        }
-        // Data files might already be ready if the app was restarted.
-        if CreateDataFiles.dataFilesCreated {
-            loadDataAsync()
-        }
-    }
-
-    private func loadDataAsync() {
+    @MainActor
+    func startLoading() {
+        guard !didStartLoading else { return }
+        didStartLoading = true
+        let displaySummary = OverviewSnapshot.screenSummary()
         DispatchQueue.global(qos: .userInitiated).async {
+            // Fast path, as upstream commit 064d609: Graphics and Display come from native
+            // APIs and Memory only needs the quick SPMemoryDataType report, so the Overview
+            // appears almost instantly with its final values (no preliminary values flash).
+            let nativeGPU = DispatchGroup()
+            DispatchQueue.global(qos: .userInitiated).async(group: nativeGPU) {
+                _ = HCGPU.shared.getNativeGPU()
+            }
+            CreateDataFiles.createOverviewDataFiles()
+            nativeGPU.wait()
+            let initial = OverviewSnapshot.initial(displaySummary: displaySummary)
+            let showInitial = HCGPU.shared.getNativeGPU() != nil
+            if showInitial {
+                DispatchQueue.main.async {
+                    AppState.shared.overviewData = initial
+                }
+            }
+
+            // Slow reports, tooltips, detail tabs and audio detection continue on this
+            // worker. Overview rows keep their values; only tooltips are filled in.
+            // GPUs not exposed by Metal need SPDisplaysDataType, so in that rare case the
+            // Overview waits for the detailed snapshot instead of showing a placeholder.
+            CreateDataFiles.getInitDataFiles()
             HardwareCollector.shared.getAllData()
-            // Pre-warm Tooltips._macModeltoolTip on the background thread.
-            // It runs `system_profiler SPPCIDataType` via run(), which would
-            // otherwise execute on the main thread when OverviewViewModel.init()
-            // accesses macModeltoolTip during a SwiftUI body-evaluation pass,
-            // causing run() → task.waitUntilExit() to pump the run loop and
-            // trigger a "setting value during update" AttributeGraph assertion.
-            _ = Tooltips.shared.macModeltoolTip
+            let detailed = OverviewSnapshot.detailed(from: initial)
             DispatchQueue.main.async {
+                AppState.shared.overviewData = detailed
                 AppState.shared.isDataLoaded = true
             }
         }
@@ -195,11 +203,5 @@ class AppState: ObservableObject {
 
     func saveWindowFrame(_ frame: NSRect) {
         defaults.set(NSStringFromRect(frame), forKey: windowFrameKey)
-    }
-
-    deinit {
-        if let token = dataFilesToken {
-            NotificationCenter.default.removeObserver(token)
-        }
     }
 }

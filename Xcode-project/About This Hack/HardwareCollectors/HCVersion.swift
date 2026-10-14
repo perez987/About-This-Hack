@@ -40,7 +40,7 @@ class HCVersion {
     }
 
     private func getOSBuild() -> String {
-        run("sw_vers -buildVersion").trimmingCharacters(in: .whitespacesAndNewlines)
+        getSysctlValueByKey(inputKey: "kern.osversion") ?? ""
     }
 
     private func setOSVersion(osNumber: String) {

@@ -15,7 +15,7 @@ struct ContentView: View {
 
     var body: some View {
         Group {
-            if appState.isDataLoaded {
+            if appState.overviewData != nil {
                 FakeSidebarLayout()
             } else {
                 LoadingView()
@@ -126,9 +126,17 @@ private struct FakeSidebarLayout: View {
         case .overview, .none:
             OverviewView()
         case .displays:
-            DisplaysView()
+            if appState.isDataLoaded {
+                DisplaysView()
+            } else {
+                LoadingView()
+            }
         case .storage:
-            StorageView()
+            if appState.isDataLoaded {
+                StorageView()
+            } else {
+                LoadingView()
+            }
         case .audio:
             if appState.shouldShowAudioTab {
                 AudioView()

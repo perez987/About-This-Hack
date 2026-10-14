@@ -69,7 +69,7 @@ struct LanguageSelectorView: View {
                                 .font(.body)
                             Spacer()
                             if selectedLanguage == language.code {
-                                Text("◁             ")
+                                Text("◁              ")
                                     .foregroundColor(Color.blue)
                                 Capsule()
                                     .frame(width: 5, height: 18)

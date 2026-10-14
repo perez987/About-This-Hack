@@ -67,9 +67,6 @@
 /* Displays tab */
 "displays.preferences" = "Настройки дисплея ";
 "displays.none" = "Дисплеи не обнаружены";
-"displays.connection.builtIn" = "Встроенный дисплей";
-"displays.connection.virtual" = "Виртуальный дисплей";
-"displays.connection.unknown" = "Неизвестный тип";
 
 /* Audio tab */
 "audio.none" = "Информация об аудиокодеке отсутствует";

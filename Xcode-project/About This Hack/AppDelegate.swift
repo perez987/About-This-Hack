@@ -36,11 +36,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
     override init() {
         super.init()
         print("Application starting")
-        // Initialize AppState first so it registers its notification observer
-        // before data-file creation starts – prevents a theoretical race condition.
-        _ = AppState.shared
-        // Start async data file creation – no blocking.
-        CreateDataFiles.getInitDataFilesAsync {}
         updaterController = UpdaterController()
     }
 
@@ -49,6 +44,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
     }
 
     func applicationDidFinishLaunching(_: Notification) {
+        AppState.shared.startLoading()
         createAndShowMainWindow()
         insertLanguageMenu()
     }
