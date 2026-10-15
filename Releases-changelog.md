@@ -1,11 +1,31 @@
 # Releases Changelog
 
+## 5.0.7 - Oct 14, 2026
+
+**Speed up initial load**
+
+- Implement a staged startup flow so Overview renders quickly from native APIs, then fills detailed tooltips/hardware data in the background
+- Based on [2009-Nissan-Cube](https://github.com/2009-Nissan-Cube/About-This-Hack) latest commits
+
+## 5.0.6 - Aug 31, 2026
+
+**Improve SystemsFunction.swift**
+
+- Improve SystemsFunction.swift, thanks to [Ybronst](https://github.com/ybronst)
+
+## 5.0.5 - Aug 25, 2026
+
+**Normalize display refresh rates**
+
+- Normalize display refresh rates to whole-number Hz (no decimals)
+
+
 ## 5.0.4 - Aug 24, 2026
 
 **Scroll bar in displays tab**
 
 - Improved the horizontal scroll bar when 2 or more screens are connected
-- Improve detection of Sidecar and AirPlay screens 
+- Improve detection of Sidecar and AirPlay screens
 
 ## 5.0.3 - Aug 19, 2026
 
@@ -27,20 +47,12 @@
 
 ## 5.0.0 - Aug 2, 2026
 
-**Migrate to Swift 6**
+**Migrate to Swift 6 (WIP)**
 
 - Major update: migration to Swift 6 → fix errors and warnings, UI enhancements, more robust logic
 - Higher minimum requirements:
    - macOS 15 Sequoia
    - Xcode supporting Swift 6
-
-## 4.4.9 - Aug 10, 2026
-
-**Enhance Displays tab**
-
-- Fix horizontal scrollbar when there are 2 or more connected displays
-- AirPlay/Sidecar display fixes in Displays tab
-- Normalize display refresh rates to whole numbers
 
 ## 4.4.8 - Jul 31, 2026
 

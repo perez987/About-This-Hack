@@ -138,7 +138,9 @@ private struct FakeSidebarLayout: View {
                 LoadingView()
             }
         case .audio:
-            if appState.shouldShowAudioTab {
+            if !appState.isDataLoaded {
+                LoadingView()
+            } else if appState.shouldShowAudioTab {
                 AudioView()
             } else {
                 OverviewView()

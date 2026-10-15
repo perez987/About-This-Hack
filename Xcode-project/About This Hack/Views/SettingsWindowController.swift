@@ -23,8 +23,8 @@ class SettingsWindowController: NSWindowController, NSWindowDelegate {
         // Create the window programmatically
         // Use the content height to match the SwiftUI view's frame
         let contentRect = NSRect(x: 0, y: 0, width: Self.windowWidth, height: Self.contentHeight)
-        let styleMask: NSWindow.StyleMask = [.titled, .closable, .miniaturizable] // opaque window
-//        let styleMask: NSWindow.StyleMask = [.titled, .closable, .miniaturizable, .fullSizeContentView] // transparent window
+//        let styleMask: NSWindow.StyleMask = [.titled, .closable, .miniaturizable] // opaque window
+        let styleMask: NSWindow.StyleMask = [.titled, .closable, .miniaturizable, .fullSizeContentView] // transparent window
         let window = NSWindow(contentRect: contentRect, styleMask: styleMask, backing: .buffered, defer: false)
 
         // Configure window properties
@@ -35,7 +35,7 @@ class SettingsWindowController: NSWindowController, NSWindowDelegate {
 
         // Enable transparent liquid-glass style (Tahoe): the SwiftUI content
         // supplies a material background (.regularMaterial), so the window
-//        // itself is kept transparent and non-opaque.
+        // itself is kept transparent and non-opaque.
 //        window.isOpaque = false
 //        window.backgroundColor = .clear
 //        window.titlebarAppearsTransparent = true

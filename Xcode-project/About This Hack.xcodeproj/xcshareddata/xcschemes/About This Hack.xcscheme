@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "2700"
+   LastUpgradeVersion = "2630"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -46,6 +46,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "115D920D26D6F65500F5DF35"
             BuildableName = "About This Hack.app"
+            BlueprintName = "About This Hack"
             ReferencedContainer = "container:About This Hack.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

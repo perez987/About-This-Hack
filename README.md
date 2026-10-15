@@ -33,7 +33,7 @@ Some will like it, some won't, and many others would have done it differently (p
 - Main version has opaque windows, but there is a version with translucent windows (`About This Hack-glass`)
 - Add audio tab with audio information (work in progress)
 - App is certified by Apple.
-- Faster first data display, adapted from upstream [commit 064d609](https://github.com/2009-Nissan-Cube/About-This-Hack/commit/064d609c770aca619aad05ddc0ba05813ef1945a): the Overview appears from native macOS APIs without waiting for `system_profiler`. Detailed RAM/GPU information, tooltips, and audio detection fill in afterward on a background thread. Displays and Storage show a loading indicator if opened before their reports are ready; the Audio tab appears after detection. GPUs not exposed by Metal and bootloaders requiring fallback detection may briefly show a dash.
+- Fast first data display, adapted from upstream [commit 064d609](https://github.com/2009-Nissan-Cube/About-This-Hack/commit/064d609c770aca619aad05ddc0ba05813ef1945a): Graphics (name, VRAM, GPU cores, Metal version) and Display come from native macOS APIs (Metal, I/O Registry, `NSScreen`), and Memory only waits for the quick `SPMemoryDataType` report, so the Overview appears almost instantly with its final values and nothing flashes. Slower `system_profiler` reports, tooltips, the Displays/Storage tabs and audio detection keep loading in the background. GPUs not exposed by Metal fall back to `system_profiler`, and in that case the Overview waits for it.
 
 You can read about the migration process in [AppKit-XIB to SwiftUI](DOCS/AppKit-XIB-to-SwiftUI.md).
 
@@ -78,6 +78,8 @@ The Audio tab is displayed in these situations:
 - VoodooHDA.kext + `getdump`
 - USB audio
 - HDMI or DisplayPort audio.
+
+On OpenCore/Clover systems, the Audio item appears with the initial Overview, without waiting for detailed audio detection. Selecting it while data is loading shows a loading indicator. Once detection finishes, the item is hidden if no supported audio is found; if it was selected, the app returns to Overview.
 
 **Note**: `getdump` is a tool available in the VoodooHDA repository. The download link is usually found in the resources section of each VoodooHDA release. The latest version is available at this [link](https://github.com/CloverHackyColor/VoodooHDA/releases/download/Release312/getdump.zip). VoodooHDA users must have `getdump` installed to get the audio tab. Simply copy the tool to `/usr/local/bin` and that's all.
 

@@ -78,6 +78,9 @@ class AppState: ObservableObject {
         didSet {
             if isDataLoaded, !oldValue {
                 print("Hardware data loaded")
+                if selectedSection == .audio, !shouldShowAudioTab {
+                    selectedSection = .overview
+                }
             }
         }
     }
@@ -142,9 +145,14 @@ class AppState: ObservableObject {
     /// or with a USB, HDMI, or DisplayPort audio device set as the default output.
     /// Hidden on real Macs and on Hackintoshes where none of these are active
     /// (or when VoodooHDA is active but getdump is not installed).
-    /// Hidden until background detection finishes, avoiding main-thread shell calls.
+    /// Provisionally shown for OpenCore/Clover using the Overview snapshot while
+    /// background detection finishes; no collectors are accessed before they are ready.
     var shouldShowAudioTab: Bool {
-        guard isDataLoaded else { return false }
+        guard isDataLoaded else {
+            let bootloader = overviewData?.bootloader
+                .trimmingCharacters(in: .whitespacesAndNewlines).lowercased() ?? ""
+            return bootloader.hasPrefix("opencore") || bootloader.hasPrefix("clover")
+        }
         guard isHackintosh else { return false }
         let driver = HCAudio.shared.getAudioInfo().driver
         return AppState.hackintoshAudioDrivers.contains(driver)
