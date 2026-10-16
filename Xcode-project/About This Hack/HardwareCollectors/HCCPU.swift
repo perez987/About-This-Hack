@@ -45,7 +45,7 @@ final class HCCPU: @unchecked Sendable {
         if result == 0, count > 0 {
             return Int(count)
         } else {
-            print("Warning: Failed to get physical CPU count via hw.packages: \(String(cString: strerror(errno)))")
+            print("Failed to get physical CPU count via hw.packages: \(String(cString: strerror(errno)))")
             // Core/thread counts are not socket counts; don't invent an Nx label.
             return 1
         }
@@ -66,7 +66,7 @@ final class HCCPU: @unchecked Sendable {
         }
 
         guard let content = HardwareCollector.shared.getCachedFileContent(InitGlobVar.hwFilePath) else {
-            print("Error: Unable to read CPU details from \(InitGlobVar.hwFilePath)")
+            print("Unable to read CPU details from \(InitGlobVar.hwFilePath)")
             return "Unable to read CPU details"
         }
 

@@ -29,7 +29,7 @@ class HCStartupDisk {
             print("HCStartupDisk: diskutil fallback — using Foundation volume name: \(name)")
             return name
         }
-        print("Error: Failed to read startup disk name from both diskutil and Foundation")
+        print("Failed to read startup disk name from both diskutil and Foundation")
         return ""
     }()
 
@@ -40,7 +40,7 @@ class HCStartupDisk {
     func getStartupDiskInfo() -> String {
         guard !startupDisk.isEmpty else { return "" }
         guard let content = HardwareCollector.shared.getCachedFileContent(InitGlobVar.storagedataFilePath) else {
-            print("Error: Failed to read detailed startup disk info from HardwareCollector cache")
+            print("Failed to read detailed startup disk info from HardwareCollector cache")
             return ""
         }
 

@@ -36,7 +36,7 @@ final class HCGPU: @unchecked Sendable {
     private func computeGPUInfo() -> String {
         // Use cached data from HardwareCollector instead of file I/O
         guard let content = HardwareCollector.shared.getCachedFileContent(InitGlobVar.scrFilePath) else {
-            print("Error: No GPU data available from HardwareCollector")
+            print("No GPU data available from HardwareCollector")
             return ""
         }
 
@@ -190,7 +190,7 @@ final class HCGPU: @unchecked Sendable {
     func getGPUInfo() -> String {
         // Use cached data from HardwareCollector
         guard let content = HardwareCollector.shared.getCachedFileContent(InitGlobVar.scrFilePath) else {
-            print("Error: No GPU details available from HardwareCollector")
+            print("No GPU details available from HardwareCollector")
             return "Graphics\n"
         }
 

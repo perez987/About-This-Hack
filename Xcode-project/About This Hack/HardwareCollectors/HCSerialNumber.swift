@@ -22,7 +22,7 @@ class HCSerialNumber {
         } else {
             let direct = run("system_profiler SPHardwareDataType 2>/dev/null")
             guard !direct.isEmpty else {
-                print("Error: No hardware info available from HardwareCollector for serial number")
+                print("No hardware info available from HardwareCollector for serial number")
                 return ("", "")
             }
             // Populate the cache so subsequent callers (e.g. HCBootloader Clover check) benefit.

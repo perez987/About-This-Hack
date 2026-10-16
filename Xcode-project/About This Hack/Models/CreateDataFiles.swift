@@ -70,6 +70,7 @@ class CreateDataFiles {
         } catch {
             print("Error: could not create temp directory \(athURL.path): \(error)")
         }
+//            print("Temp directory is \(athURL.path)")
     }
 
     /// Fast reports the Overview needs beyond native APIs (memory type/speed and

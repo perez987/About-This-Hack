@@ -34,7 +34,7 @@ final class HCDisplay: @unchecked Sendable {
     private func computeDisplayInfo() -> (mainDisplay: String, allDisplays: String) {
         // Use cached data from HardwareCollector instead of file I/O
         guard let content = HardwareCollector.shared.getCachedFileContent(InitGlobVar.scrFilePath) else {
-            print("Error: No display data available from HardwareCollector")
+            print("No display data available from HardwareCollector")
             return ("Unknown Display", "No display information available")
         }
 
@@ -91,7 +91,7 @@ final class HCDisplay: @unchecked Sendable {
         }
 
         guard !firstDisplayLines.isEmpty else {
-            print("Error: Displays section not found in cached data")
+            print("Displays section not found in cached data;\nit will be retrieved later")
             return ("Unknown Display", "No display information available")
         }
 
