@@ -3,7 +3,7 @@
 ![Platform](https://img.shields.io/badge/macOS-15-orange.svg)
 ![Swift](https://img.shields.io/badge/Swift-6-blue.svg)
 ![Xcode](https://img.shields.io/badge/Xcode-26-lavender.svg)
-<!-- ![GitHub Downloads](https://img.shields.io/github/downloads/perez987/About-This-Hack/total?style=flat&label=Downloads&color=green) -->
+![GitHub Downloads](https://img.shields.io/github/downloads/perez987/About-This-Hack/total?style=flat&label=Downloads&color=green)
 
 | |
 | --- |
