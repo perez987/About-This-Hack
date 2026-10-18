@@ -3,7 +3,7 @@
 ![Platform](https://img.shields.io/badge/macOS-15-orange.svg)
 ![Swift](https://img.shields.io/badge/Swift-6-blue.svg)
 ![Xcode](https://img.shields.io/badge/Xcode-26-lavender.svg)
-![GitHub Downloads](https://img.shields.io/github/downloads/perez987/About-This-Hack/total?style=flat&label=Downloads&color=green)
+![Downloads](https://img.shields.io/github/downloads/perez987/About-This-Hack/total?style=flat&label=Downloads&labelColor=Downloads)
 
 | |
 | --- |
@@ -49,7 +49,7 @@ Discover the heart of your macOS device with About This Hack: a sleek, intuitive
 
 A throwback to the (better) About This Mac view from pre-Ventura. Get instant access to essential system specs, including your computer model, OS version, and processor details. Hackintosh users will appreciate the Clover or OpenCore bootloader version display.
 
-> 💡 Pro Tip: Click the icon next to your serial number to hide it for screenshots!
+> 💡 Pro Tip: Click the icon next to your serial number to hide show it!
 
 ## Displays
 
