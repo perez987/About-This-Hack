@@ -8,7 +8,7 @@
 - Swift 6 + SwiftUI UI (migrated from AppKit/XIB)
 - Storyboard-free (AppDelegate bootstraps everything manually)
 - Auto-updater via Sparkle framework (SPM dependency)
-- Localized into: English (`en`), Spanish (`es`), German (`de`), French (`fr`), Italian (`it`)
+- Localized into: English (`en`), Spanish (`es`), German (`de`), French (`fr`), Italian (`it`), Russian (`ru`)
 - Transparent/liquid-glass window style (`.ultraThinMaterial` / `.regularMaterial` backgrounds)
 
 ## Tech Stack
@@ -83,7 +83,7 @@ About-This-Hack/
     │   ├── LanguageSelectorView.swift
     │   ├── LanguageSelectorWindowController.swift
     │   └── WindowController.swift       ← AppState: ObservableObject shared state
-    └── {en,es,fr,it,de}.lproj/
+    └── {en,es,fr,it,de,ru}.lproj/
         └── Localizable.strings
 ```
 
@@ -175,9 +175,9 @@ The Audio tab is only shown on Hackintoshes or Macs with OCLP / OpenCore:
 
 - All user-facing strings use `NSLocalizedString("key", comment: "…")`.
 - String files live at `{lang}.lproj/Localizable.strings`.
-- Supported languages: `en`, `es`, `de`, `fr`, `it`.
+- Supported languages: `en`, `es`, `de`, `fr`, `it`, `ru`.
 - Language is changed at runtime by writing `[langCode]` to `UserDefaults "AppleLanguages"` and restarting the app. The Language Selector window (`LanguageSelectorView`) handles this.
-- When adding a new string, add it to all five `.strings` files. The key in every file must match exactly.
+- When adding a new string, add it to all six `.strings` files. The key in every file must match exactly.
 
 ## Assets
 
@@ -210,7 +210,15 @@ Assets are in `Assets.xcassets`. Notable image sets:
 - Open `About This Hack.xcodeproj` in a current Xcode release with Swift 6 support.
 - Xcode resolves the Sparkle SPM package automatically on first open/build.
 - Target: macOS 15+, architecture: universal (Apple Silicon + Intel).
-- There are no automated test targets in the project.
+- The `AboutThisHackTests` XCTest target includes:
+  - Formatting checks for processor and bootloader output, plus system-version comparison.
+  - Localization key parity checks across `en`, `de`, `es`, `fr`, `it`, and `ru`.
+  - Live hardware collector checks. These wait up to 60 seconds for `AppState.isDataLoaded` before reading collector values.
+  - An audio collector check that runs only when `AppState.shouldShowAudioTab` is true; otherwise XCTest skips it.
+- Run the tests from `Xcode-project` with:
+  ```sh
+  xcodebuild test -project "About This Hack.xcodeproj" -scheme "About This Hack" -destination platform=macOS
+  ```
 - The app is storyboard-free: `NSPrincipalClass` points to `AppDelegate`, and `AppDelegate.main()` is the entry point (marked `@main`).
 
 ## Agent Quickstart (for new tasks)
