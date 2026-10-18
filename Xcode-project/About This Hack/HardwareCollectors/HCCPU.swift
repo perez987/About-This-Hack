@@ -45,7 +45,7 @@ final class HCCPU: @unchecked Sendable {
         if result == 0, count > 0 {
             return Int(count)
         } else {
-            print("Failed to get physical CPU count via hw.packages: \(String(cString: strerror(errno)))")
+            print("Warning: Failed to get physical CPU count via hw.packages: \(String(cString: strerror(errno)))")
             // Core/thread counts are not socket counts; don't invent an Nx label.
             return 1
         }

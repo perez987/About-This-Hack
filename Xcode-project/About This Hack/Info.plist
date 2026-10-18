@@ -31,7 +31,7 @@
 	<key>SUEnableSystemProfiling</key>
 	<false/>
 	<key>SUFeedURL</key>
-	<string>https://raw.githubusercontent.com/perez987/About-This-Hack/main/appcast-6.xml</string>
+	<string>https://raw.githubusercontent.com/perez987/About-This-Hack/main/appcast-6glass.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>ZlKWZcBX5/V65EwhgJe0G+veSzYUiYrpJZL9dLE8vjw=</string>
 	<key>SUScheduledCheckInterval</key>

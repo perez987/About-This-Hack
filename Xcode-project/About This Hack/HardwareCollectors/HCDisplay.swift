@@ -91,7 +91,7 @@ final class HCDisplay: @unchecked Sendable {
         }
 
         guard !firstDisplayLines.isEmpty else {
-            print("Displays section not found in cached data;\nit will be retrieved later")
+            print("Displays section not found in cached data, it will be retrieved later")
             return ("Unknown Display", "No display information available")
         }
 

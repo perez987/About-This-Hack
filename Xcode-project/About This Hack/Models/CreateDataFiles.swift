@@ -68,9 +68,9 @@ class CreateDataFiles {
         do {
             try fm.createDirectory(at: athURL, withIntermediateDirectories: true)
         } catch {
-            print("Error: could not create temp directory \(athURL.path): \(error)")
+            print("Could not create temp directory \(athURL.path): \(error)")
         }
-//            print("Temp directory is \(athURL.path)")
+//        print("Temp directory is \(athURL.path)")
     }
 
     /// Fast reports the Overview needs beyond native APIs (memory type/speed and

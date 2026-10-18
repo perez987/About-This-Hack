@@ -49,7 +49,7 @@ Discover the heart of your macOS device with About This Hack: a sleek, intuitive
 
 A throwback to the (better) About This Mac view from pre-Ventura. Get instant access to essential system specs, including your computer model, OS version, and processor details. Hackintosh users will appreciate the Clover or OpenCore bootloader version display.
 
-> 💡 Pro Tip: Click the icon next to your serial number to hide show it!
+> 💡 Pro Tip: Click the icon next to your serial number to show it!
 
 ## Displays
 
@@ -131,6 +131,16 @@ The custom logo image is saved in the path `~/Library/Application Support/com.0x
 
 - Supports macOS 15 Sequoia and newer
 - Not compatible with Linux or Windows.
+
+## Building from Source
+
+Open `About This Hack.xcodeproj` in Xcode and run the **About This Hack** scheme. To run the tests from the command line:
+
+```sh
+xcodebuild test -project "About This Hack.xcodeproj" -scheme "About This Hack" -destination platform=macOS
+```
+
+The tests cover processor and bootloader formatting, version comparison, matching localization keys across languages, and a quick check that each hardware collector returns a value on the current Mac.
 
 ## Credits
 
