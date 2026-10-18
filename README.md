@@ -74,6 +74,7 @@ Check audio information. This applies only to Hackintosh; original Macs do not h
 The Audio tab is displayed in these situations:
 
 - AppleALC.kext + AppleHDA.kext
+- SimpleHDA.kext
 - HDAUniversal.kext
 - VoodooHDA.kext + `getdump`
 - USB audio
