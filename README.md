@@ -80,8 +80,6 @@ The Audio tab is displayed in these situations:
 - USB audio
 - HDMI or DisplayPort audio.
 
-On OpenCore/Clover systems, the Audio item appears with the initial Overview, without waiting for detailed audio detection. Selecting it while data is loading shows a loading indicator. Once detection finishes, the item is hidden if no supported audio is found; if it was selected, the app returns to Overview.
-
 **Note**: `getdump` is a tool available in the VoodooHDA repository. The download link is usually found in the resources section of each VoodooHDA release. The latest version is available at this [link](https://github.com/CloverHackyColor/VoodooHDA/releases/download/Release312/getdump.zip). VoodooHDA users must have `getdump` installed to get the audio tab. Simply copy the tool to `/usr/local/bin` and that's all.
 
 ## Support
