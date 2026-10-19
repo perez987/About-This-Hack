@@ -33,7 +33,7 @@ Some will like it, some won't, and many others would have done it differently (p
 - Main version has opaque windows, but there is a version with translucent windows (`About This Hack-glass`)
 - Add audio tab with audio information (work in progress)
 - App is certified by Apple.
-- Fast first data display, adapted from upstream [commit 064d609](https://github.com/2009-Nissan-Cube/About-This-Hack/commit/064d609c770aca619aad05ddc0ba05813ef1945a): Graphics (name, VRAM, GPU cores, Metal version) and Display come from native macOS APIs (Metal, I/O Registry, `NSScreen`), and Memory only waits for the quick `SPMemoryDataType` report, so the Overview appears almost instantly with its final values and nothing flashes. Slower `system_profiler` reports, tooltips, the Displays/Storage tabs and audio detection keep loading in the background. GPUs not exposed by Metal fall back to `system_profiler`, and in that case the Overview waits for it.
+- Fast first data display, adapted from upstream [commit 064d609](https://github.com/2009-Nissan-Cube/About-This-Hack/commit/064d609c770aca619aad05ddc0ba05813ef1945a).
 
 You can read about the migration process in [AppKit-XIB to SwiftUI](DOCS/AppKit-XIB-to-SwiftUI.md).
 
@@ -140,7 +140,7 @@ Open `About This Hack.xcodeproj` in Xcode and run the **About This Hack** scheme
 xcodebuild test -project "About This Hack.xcodeproj" -scheme "About This Hack" -destination platform=macOS
 ```
 
-The tests cover processor and bootloader formatting, version comparison, matching localization keys across languages, and a quick check that each hardware collector returns a value on the current Mac.
+The tests cover processor and bootloader formatting, GPU name fallback and per-adapter PCI matching, version comparison, matching localization keys across languages, and a quick check that each hardware collector returns a value on the current Mac.
 
 ## Credits
 
