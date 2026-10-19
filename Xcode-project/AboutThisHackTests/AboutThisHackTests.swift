@@ -1,5 +1,5 @@
 import XCTest
-@testable import About_This_Hack_glass
+@testable import About_This_Hack
 
 final class FormattingTests: XCTestCase {
     func testProcessorFormatting() {

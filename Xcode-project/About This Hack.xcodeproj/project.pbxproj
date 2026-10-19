@@ -53,7 +53,7 @@
 			containerPortal = 115D920626D6F65500F5DF35 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 115D920D26D6F65500F5DF35;
-			remoteInfo = "About This Hack-glass";
+			remoteInfo = "About This Hack";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -638,7 +638,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.0xCUBE.About-This-Hack.Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 6.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/About This Hack-glass.app/Contents/MacOS/About This Hack-glass";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/About This Hack.app/Contents/MacOS/About This Hack";
 			};
 			name = Debug;
 		};
@@ -652,7 +652,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.0xCUBE.About-This-Hack.Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 6.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/About This Hack-glass.app/Contents/MacOS/About This Hack-glass";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/About This Hack.app/Contents/MacOS/About This Hack";
 			};
 			name = Release;
 		};
