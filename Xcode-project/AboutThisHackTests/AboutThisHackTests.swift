@@ -1,4 +1,5 @@
 import XCTest
+
 @testable import About_This_Hack
 
 final class FormattingTests: XCTestCase {
@@ -14,7 +15,9 @@ final class FormattingTests: XCTestCase {
         let bootloader = HCBootloader.shared.getBootloader()
 
         XCTAssertFalse(bootloader.isEmpty)
-        XCTAssertEqual(bootloader, bootloader.trimmingCharacters(in: .whitespacesAndNewlines))
+        XCTAssertEqual(
+            bootloader,
+            bootloader.trimmingCharacters(in: .whitespacesAndNewlines))
         XCTAssertTrue(
             ["Apple iBoot", "Apple UEFI", "OpenCore", "Clover"]
                 .contains { bootloader.hasPrefix($0) },
@@ -37,13 +40,14 @@ final class FormattingTests: XCTestCase {
         let processInfo = ProcessInfo.processInfo
         XCTAssertTrue(processInfo.isOperatingSystemAtLeast(reportedVersion))
         let version = processInfo.operatingSystemVersion
-        XCTAssertFalse(ProcessInfo.processInfo.isOperatingSystemAtLeast(
-            OperatingSystemVersion(
-                majorVersion: version.majorVersion + 1,
-                minorVersion: 0,
-                patchVersion: 0
-            )
-        ))
+        XCTAssertFalse(
+            ProcessInfo.processInfo.isOperatingSystemAtLeast(
+                OperatingSystemVersion(
+                    majorVersion: version.majorVersion + 1,
+                    minorVersion: 0,
+                    patchVersion: 0
+                )
+            ))
         XCTAssertEqual(reportedVersion.majorVersion, version.majorVersion)
         XCTAssertEqual(reportedVersion.minorVersion, version.minorVersion)
     }
@@ -57,18 +61,25 @@ final class LocalizationTests: XCTestCase {
 
         for language in ["de", "es", "fr", "it", "ru"] {
             let other = try localizationKeys(for: language, in: bundle)
-            XCTAssertEqual(english.subtracting(other), [], "Keys missing in \(language)")
-            XCTAssertEqual(other.subtracting(english), [], "Extra keys in \(language)")
+            XCTAssertEqual(
+                english.subtracting(other), [], "Keys missing in \(language)")
+            XCTAssertEqual(
+                other.subtracting(english), [], "Extra keys in \(language)")
         }
     }
 
-    private func localizationKeys(for language: String, in bundle: Bundle) throws -> Set<String> {
+    private func localizationKeys(for language: String, in bundle: Bundle)
+        throws -> Set<String>
+    {
         let path = try XCTUnwrap(
-            bundle.path(forResource: "Localizable", ofType: "strings", inDirectory: nil, forLocalization: language),
+            bundle.path(
+                forResource: "Localizable", ofType: "strings", inDirectory: nil,
+                forLocalization: language),
             "Missing Localizable.strings for \(language)"
         )
         let data = try Data(contentsOf: URL(fileURLWithPath: path))
-        let propertyList = try PropertyListSerialization.propertyList(from: data, format: nil)
+        let propertyList = try PropertyListSerialization.propertyList(
+            from: data, format: nil)
         let strings = try XCTUnwrap(propertyList as? [String: String])
         return Set(strings.keys)
     }
@@ -78,7 +89,8 @@ final class LiveHardwareTests: XCTestCase {
     override func setUpWithError() throws {
         try super.setUpWithError()
         let loaded = NSPredicate { _, _ in AppState.shared.isDataLoaded }
-        let expectation = XCTNSPredicateExpectation(predicate: loaded, object: nil)
+        let expectation = XCTNSPredicateExpectation(
+            predicate: loaded, object: nil)
         XCTAssertEqual(
             XCTWaiter.wait(for: [expectation], timeout: 60), .completed,
             "Hardware collection and app state initialization did not finish"
@@ -104,15 +116,16 @@ final class LiveHardwareTests: XCTestCase {
         )
 
         let audio = HCAudio.shared.getAudioInfo()
-        XCTAssertFalse([
-            audio.codecName,
-            audio.vendorName,
-            audio.deviceName,
-            audio.layoutId,
-            audio.driver,
-            audio.codecHex,
-            audio.vendorHex,
-            audio.deviceHex,
-        ].allSatisfy(\.isEmpty))
+        XCTAssertFalse(
+            [
+                audio.codecName,
+                audio.vendorName,
+                audio.deviceName,
+                audio.layoutId,
+                audio.driver,
+                audio.codecHex,
+                audio.vendorHex,
+                audio.deviceHex,
+            ].allSatisfy(\.isEmpty))
     }
 }
