@@ -23,15 +23,11 @@ enum AppSection: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .overview:
-            NSLocalizedString("segment.title.overview", comment: "Overview")
-        case .displays:
-            NSLocalizedString("segment.title.displays", comment: "Displays")
-        case .storage:
-            NSLocalizedString("segment.title.storage", comment: "Storage")
+        case .overview: NSLocalizedString("segment.title.overview", comment: "Overview")
+        case .displays: NSLocalizedString("segment.title.displays", comment: "Displays")
+        case .storage: NSLocalizedString("segment.title.storage", comment: "Storage")
         case .audio: NSLocalizedString("segment.title.audio", comment: "Audio")
-        case .support:
-            NSLocalizedString("segment.title.support", comment: "Support")
+        case .support: NSLocalizedString("segment.title.support", comment: "Support")
         }
     }
 
@@ -47,28 +43,11 @@ enum AppSection: String, CaseIterable, Identifiable {
 
     var tooltip: String {
         switch self {
-        case .overview:
-            NSLocalizedString(
-                "segment.tooltip.overview",
-                comment: "Overview tooltip"
-            )
-        case .displays:
-            NSLocalizedString(
-                "segment.tooltip.displays",
-                comment: "Displays tooltip"
-            )
-        case .storage:
-            NSLocalizedString(
-                "segment.tooltip.storage",
-                comment: "Storage tooltip"
-            )
-        case .audio:
-            NSLocalizedString("segment.tooltip.audio", comment: "Audio tooltip")
-        case .support:
-            NSLocalizedString(
-                "segment.tooltip.support",
-                comment: "Support tooltip"
-            )
+        case .overview: NSLocalizedString("segment.tooltip.overview", comment: "Overview tooltip")
+        case .displays: NSLocalizedString("segment.tooltip.displays", comment: "Displays tooltip")
+        case .storage: NSLocalizedString("segment.tooltip.storage", comment: "Storage tooltip")
+        case .audio: NSLocalizedString("segment.tooltip.audio", comment: "Audio tooltip")
+        case .support: NSLocalizedString("segment.tooltip.support", comment: "Support tooltip")
         }
     }
 }
@@ -78,22 +57,19 @@ enum AppSection: String, CaseIterable, Identifiable {
 /// Shared observable state used by both AppDelegate (menu actions) and ContentView (navigation).
 class AppState: ObservableObject {
     nonisolated(unsafe) static let shared = AppState()
-    private static let hackintoshAudioDrivers: Set<String> = [
-        "AppleALC", "HDAUniversal", "VoodooHDA", "USB", "HDMI", "DisplayPort",
-    ]
+    static let hackintoshAudioDrivers: Set<String> = ["AppleALC", "SimpleHDA", "HDAUniversal", "VoodooHDA", "USB", "HDMI", "DisplayPort"]
 
     @Published var selectedSection: AppSection? = .overview {
         didSet {
             guard selectedSection != oldValue else { return }
-            let tabName =
-                switch selectedSection {
-                case .overview: "Overview"
-                case .displays: "Displays"
-                case .storage: "Storage"
-                case .audio: "Audio"
-                case .support: "Support"
-                case .none: "Unknown"
-                }
+            let tabName = switch selectedSection {
+            case .overview: "Overview"
+            case .displays: "Displays"
+            case .storage: "Storage"
+            case .audio: "Audio"
+            case .support: "Support"
+            case .none: "Unknown"
+            }
             print("Switched to tab: \(tabName)")
         }
     }
@@ -117,8 +93,7 @@ class AppState: ObservableObject {
     var hasAudioData: Bool {
         guard isDataLoaded else { return false }
         let info = HCAudio.shared.getAudioInfo()
-        return !info.vendorName.isEmpty || !info.codecName.isEmpty
-            || !info.layoutId.isEmpty
+        return !info.vendorName.isEmpty || !info.codecName.isEmpty || !info.layoutId.isEmpty
     }
 
     private nonisolated(unsafe) static var didPrintRealMac = false
@@ -132,30 +107,26 @@ class AppState: ObservableObject {
     /// Unavailable until bootloader and audio detection have finished.
     var isHackintosh: Bool {
         guard isDataLoaded else { return false }
-        let bootloader = HCBootloader.shared.getBootloader().trimmingCharacters(
-            in: .whitespacesAndNewlines
-        )
+        let bootloader = HCBootloader.shared.getBootloader().trimmingCharacters(in: .whitespacesAndNewlines)
         let normalizedBootloader = bootloader.lowercased()
 
         if normalizedBootloader.hasPrefix("clover") {
             return true
         }
         if normalizedBootloader.hasPrefix("opencore") {
-            if FileManager.default.fileExists(
-                atPath: InitGlobVar.oclpXmlFilePath
-            ) {
+            if FileManager.default.fileExists(atPath: InitGlobVar.oclpXmlFilePath) {
                 let driver = HCAudio.shared.getAudioInfo().driver
                 // OpenCore + OCLP can mean either a real Mac patched for newer macOS
                 // compatibility, or a Hackintosh that uses OCLP for driver patches
                 // (e.g. audio, WiFi on Sonoma).  Treat as Hackintosh when
-                // AppleALC, HDAUniversal, VoodooHDA, USB, HDMI, or DisplayPort audio is detected as the default output.
+                // AppleALC, SimpleHDA, HDAUniversal, VoodooHDA, USB, HDMI, or DisplayPort audio is detected as the default output.
                 return AppState.hackintoshAudioDrivers.contains(driver)
             }
             return true
         }
 
         // Fallback for OpenCore systems where bootloader string lookup failed:
-        // Known Hackintosh audio drivers (AppleALC / HDAUniversal / VoodooHDA /
+        // Known Hackintosh audio drivers (AppleALC / SimpleHDA / HDAUniversal / VoodooHDA /
         // USB / HDMI / DisplayPort) indicate this is not a stock Apple boot path.
         let driver = HCAudio.shared.getAudioInfo().driver
         if AppState.hackintoshAudioDrivers.contains(driver) {
@@ -163,16 +134,14 @@ class AppState: ObservableObject {
         }
 
         // Apple iBoot (Apple Silicon) or Apple UEFI → real Mac
-        if normalizedBootloader.hasPrefix("apple iboot")
-            || normalizedBootloader.hasPrefix("apple uefi")
-        {
+        if normalizedBootloader.hasPrefix("apple iboot") || normalizedBootloader.hasPrefix("apple uefi") {
             AppState.printRealMacOnce()
         }
         return false
     }
 
     /// True when the audio tab should be visible.
-    /// Shown on Hackintoshes running AppleALC, HDAUniversal, VoodooHDA (with getdump available),
+    /// Shown on Hackintoshes running AppleALC, SimpleHDA, HDAUniversal, VoodooHDA (with getdump available),
     /// or with a USB, HDMI, or DisplayPort audio device set as the default output.
     /// Hidden on real Macs and on Hackintoshes where none of these are active
     /// (or when VoodooHDA is active but getdump is not installed).
@@ -180,12 +149,9 @@ class AppState: ObservableObject {
     /// background detection finishes; no collectors are accessed before they are ready.
     var shouldShowAudioTab: Bool {
         guard isDataLoaded else {
-            let bootloader =
-                overviewData?.bootloader
-                .trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-                ?? ""
-            return bootloader.hasPrefix("opencore")
-                || bootloader.hasPrefix("clover")
+            let bootloader = overviewData?.bootloader
+                .trimmingCharacters(in: .whitespacesAndNewlines).lowercased() ?? ""
+            return bootloader.hasPrefix("opencore") || bootloader.hasPrefix("clover")
         }
         guard isHackintosh else { return false }
         let driver = HCAudio.shared.getAudioInfo().driver
@@ -212,9 +178,7 @@ class AppState: ObservableObject {
             }
             CreateDataFiles.createOverviewDataFiles()
             nativeGPU.wait()
-            let initial = OverviewSnapshot.initial(
-                displaySummary: displaySummary
-            )
+            let initial = OverviewSnapshot.initial(displaySummary: displaySummary)
             let showInitial = HCGPU.shared.getNativeGPU() != nil
             if showInitial {
                 DispatchQueue.main.async {
@@ -239,9 +203,7 @@ class AppState: ObservableObject {
     // MARK: - Window Frame Persistence
 
     func savedWindowFrame(for size: NSSize) -> NSRect? {
-        guard let saved = defaults.string(forKey: windowFrameKey) else {
-            return nil
-        }
+        guard let saved = defaults.string(forKey: windowFrameKey) else { return nil }
         var frame = NSRectFromString(saved)
         frame.size = size
         return frame

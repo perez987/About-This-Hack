@@ -1,5 +1,4 @@
 import XCTest
-
 @testable import About_This_Hack
 
 final class FormattingTests: XCTestCase {
@@ -15,10 +14,7 @@ final class FormattingTests: XCTestCase {
         let bootloader = HCBootloader.shared.getBootloader()
 
         XCTAssertFalse(bootloader.isEmpty)
-        XCTAssertEqual(
-            bootloader,
-            bootloader.trimmingCharacters(in: .whitespacesAndNewlines)
-        )
+        XCTAssertEqual(bootloader, bootloader.trimmingCharacters(in: .whitespacesAndNewlines))
         XCTAssertTrue(
             ["Apple iBoot", "Apple UEFI", "OpenCore", "Clover"]
                 .contains { bootloader.hasPrefix($0) },
@@ -41,66 +37,53 @@ final class FormattingTests: XCTestCase {
         let processInfo = ProcessInfo.processInfo
         XCTAssertTrue(processInfo.isOperatingSystemAtLeast(reportedVersion))
         let version = processInfo.operatingSystemVersion
-        XCTAssertFalse(
-            ProcessInfo.processInfo.isOperatingSystemAtLeast(
-                OperatingSystemVersion(
-                    majorVersion: version.majorVersion + 1,
-                    minorVersion: 0,
-                    patchVersion: 0
-                )
+        XCTAssertFalse(ProcessInfo.processInfo.isOperatingSystemAtLeast(
+            OperatingSystemVersion(
+                majorVersion: version.majorVersion + 1,
+                minorVersion: 0,
+                patchVersion: 0
             )
-        )
+        ))
         XCTAssertEqual(reportedVersion.majorVersion, version.majorVersion)
         XCTAssertEqual(reportedVersion.minorVersion, version.minorVersion)
     }
 }
 
 final class GPUFallbackTests: XCTestCase {
-    private let intelIdentity = HCGPU.PCIIdentity(
-        vendorID: 0x8086,
-        deviceID: 0x3e98
-    )
+    private let intelIdentity = HCGPU.PCIIdentity(vendorID: 0x8086, deviceID: 0x3e98)
     private let intelReport = """
-        Graphics/Displays:
+    Graphics/Displays:
 
-            Intel UHD Graphics 630:
+        Intel UHD Graphics 630:
 
-              Chipset Model: Intel UHD Graphics 630
-              Type: GPU
-              Bus: Built-In
-              VRAM (Dynamic, Max): 1536 MB
-              Vendor: Intel (0x8086)
-              Device ID: 0x3e98
-              Metal Support: Metal 3
-              Displays:
-                Main Display:
-                  VRAM: 999 GB
-                  Metal Support: Not an adapter property
-        """
+          Chipset Model: Intel UHD Graphics 630
+          Type: GPU
+          Bus: Built-In
+          VRAM (Dynamic, Max): 1536 MB
+          Vendor: Intel (0x8086)
+          Device ID: 0x3e98
+          Metal Support: Metal 3
+          Displays:
+            Main Display:
+              VRAM: 999 GB
+              Metal Support: Not an adapter property
+    """
     private let amdReport = """
-            AMD Radeon RX 580:
+        AMD Radeon RX 580:
 
-              Chipset Model: AMD Radeon RX 580
-              VRAM (Total): 8 GB
-              Vendor: AMD (0x1002)
-              Device ID: 0x67df
-              Metal Support: Metal 2
-              Displays:
-                External Display:
-                  Resolution: 1920 x 1080
-        """
+          Chipset Model: AMD Radeon RX 580
+          VRAM (Total): 8 GB
+          Vendor: AMD (0x1002)
+          Device ID: 0x67df
+          Metal Support: Metal 2
+          Displays:
+            External Display:
+              Resolution: 1920 x 1080
+    """
 
     func testUnknownMetalNamesFallBack() {
-        for name in [
-            "Intel(R) KBL Unknown", "Intel(R) KBL uNkNoWn", "UNKNOWN",
-            "unknown",
-        ] {
-            XCTAssertNil(
-                HCGPU.nativeSummary(
-                    name: name,
-                    details: ["1536 MB", "Metal 3"]
-                )
-            )
+        for name in ["Intel(R) KBL Unknown", "Intel(R) KBL uNkNoWn", "UNKNOWN", "unknown"] {
+            XCTAssertNil(HCGPU.nativeSummary(name: name, details: ["1536 MB", "Metal 3"]))
         }
     }
 
@@ -112,24 +95,15 @@ final class GPUFallbackTests: XCTestCase {
 
     func testKnownMetalNamesKeepFormatting() {
         XCTAssertEqual(
-            HCGPU.nativeSummary(
-                name: "Intel(R) UHD Graphics 630",
-                details: ["", "Metal 3"]
-            ),
+            HCGPU.nativeSummary(name: "Intel(R) UHD Graphics 630", details: ["", "Metal 3"]),
             "Intel(R) UHD Graphics 630 (Metal 3)"
         )
         XCTAssertEqual(
-            HCGPU.nativeSummary(
-                name: "Apple M4 Pro",
-                details: ["", "20-Core", "Metal 4"]
-            ),
+            HCGPU.nativeSummary(name: "Apple M4 Pro", details: ["", "20-Core", "Metal 4"]),
             "Apple M4 Pro (20-Core, Metal 4)"
         )
         XCTAssertEqual(
-            HCGPU.nativeSummary(
-                name: "AMD Radeon RX 580",
-                details: ["8 GB", "", "Metal 3"]
-            ),
+            HCGPU.nativeSummary(name: "AMD Radeon RX 580", details: ["8 GB", "", "Metal 3"]),
             "AMD Radeon RX 580 (8 GB, Metal 3)"
         )
         XCTAssertEqual(HCGPU.nativeSummary(name: " GPU ", details: []), " GPU ")
@@ -147,10 +121,7 @@ final class GPUFallbackTests: XCTestCase {
     }
 
     func testSuppliedIntelReportWithoutHexVendorKeepsSummary() {
-        let report = intelReport.replacingOccurrences(
-            of: "Vendor: Intel (0x8086)",
-            with: "Vendor: Intel"
-        )
+        let report = intelReport.replacingOccurrences(of: "Vendor: Intel (0x8086)", with: "Vendor: Intel")
         for identity in [nil, intelIdentity] {
             XCTAssertEqual(
                 HCGPU.profilerSummary(report, selectedIdentity: identity),
@@ -160,20 +131,14 @@ final class GPUFallbackTests: XCTestCase {
     }
 
     func testUniquePCIMatchIgnoresProfilerOrder() {
-        for report in [
-            intelReport + "\n" + amdReport, amdReport + "\n" + intelReport,
-        ] {
+        for report in [intelReport + "\n" + amdReport, amdReport + "\n" + intelReport] {
             XCTAssertEqual(
                 HCGPU.profilerSummary(report, selectedIdentity: intelIdentity),
                 "UHD Graphics 630 1536 MB (Metal 3)"
             )
             XCTAssertEqual(
                 HCGPU.profilerSummary(
-                    report,
-                    selectedIdentity: HCGPU.PCIIdentity(
-                        vendorID: 0x1002,
-                        deviceID: 0x67df
-                    )
+                    report, selectedIdentity: HCGPU.PCIIdentity(vendorID: 0x1002, deviceID: 0x67df)
                 ),
                 "Radeon RX 580 8 GB (Metal 2)"
             )
@@ -192,16 +157,9 @@ final class GPUFallbackTests: XCTestCase {
                 "UHD Graphics 630 1536 MB (Metal 3); Radeon RX 580 8 GB (Metal 2)"
             )
         }
-        let missingIDs =
-            report
-            .replacingOccurrences(
-                of: "Vendor: Intel (0x8086)",
-                with: "Vendor: Intel"
-            )
-            .replacingOccurrences(
-                of: "Device ID: 0x3e98",
-                with: "Device ID: unavailable"
-            )
+        let missingIDs = report
+            .replacingOccurrences(of: "Vendor: Intel (0x8086)", with: "Vendor: Intel")
+            .replacingOccurrences(of: "Device ID: 0x3e98", with: "Device ID: unavailable")
         XCTAssertEqual(
             HCGPU.profilerSummary(missingIDs, selectedIdentity: intelIdentity),
             "UHD Graphics 630 1536 MB (Metal 3); Radeon RX 580 8 GB (Metal 2)"
@@ -210,45 +168,111 @@ final class GPUFallbackTests: XCTestCase {
 
     func testDuplicatePCIMatchReportsAllAdapters() {
         XCTAssertEqual(
-            HCGPU.profilerSummary(
-                intelReport + "\n" + intelReport,
-                selectedIdentity: intelIdentity
-            ),
+            HCGPU.profilerSummary(intelReport + "\n" + intelReport, selectedIdentity: intelIdentity),
             "UHD Graphics 630 1536 MB (Metal 3); UHD Graphics 630 1536 MB (Metal 3)"
         )
     }
 
     func testVRAMIsNotBorrowedFromAnotherGPUOrDisplay() {
-        let noVRAM = intelReport.replacingOccurrences(
-            of: "VRAM (Dynamic, Max): 1536 MB",
-            with: ""
-        )
+        let noVRAM = intelReport.replacingOccurrences(of: "VRAM (Dynamic, Max): 1536 MB", with: "")
         XCTAssertEqual(
-            HCGPU.profilerSummary(
-                noVRAM + "\n" + amdReport,
-                selectedIdentity: intelIdentity
-            ),
+            HCGPU.profilerSummary(noVRAM + "\n" + amdReport, selectedIdentity: intelIdentity),
             "UHD Graphics 630 (Metal 3)"
         )
         XCTAssertEqual(
-            HCGPU.profilerSummary(
-                noVRAM + "\n" + amdReport,
-                selectedIdentity: nil
-            ),
+            HCGPU.profilerSummary(noVRAM + "\n" + amdReport, selectedIdentity: nil),
             "UHD Graphics 630 (Metal 3); Radeon RX 580 8 GB (Metal 2)"
         )
     }
 
     func testSectionHeaderSuppliesMissingChipsetName() {
-        let noChipset = intelReport.replacingOccurrences(
-            of: "Chipset Model: Intel UHD Graphics 630",
-            with: ""
-        )
+        let noChipset = intelReport.replacingOccurrences(of: "Chipset Model: Intel UHD Graphics 630", with: "")
         XCTAssertEqual(
             HCGPU.profilerSummary(noChipset, selectedIdentity: nil),
             "UHD Graphics 630 1536 MB (Metal 3)"
         )
         XCTAssertEqual(HCGPU.profilerSummary("", selectedIdentity: nil), "")
+    }
+}
+
+final class AudioDriverTests: XCTestCase {
+    private func collector(
+        simpleHDAOutput: String,
+        codecOutput: String = "\"IOHDACodecVendorID\" = 283906592",
+        audioOutput: String = ""
+    ) -> HCAudio {
+        HCAudio { command in
+            switch command {
+            case "system_profiler SPAudioDataType 2>/dev/null":
+                return audioOutput
+            case "ioreg -l -r -c IOHDACodecDevice -w 0 2>/dev/null":
+                return codecOutput
+            case "ioreg -l -r -n HDEF -w 0 2>/dev/null":
+                return """
+                "layout-id" = <07000000>
+                "vendor-id" = <86800000>
+                "device-id" = <70a10000>
+                """
+            case "ioreg -p IOService -r -c SimpleHDA -d 1 -w 0 2>/dev/null":
+                return simpleHDAOutput
+            default:
+                return ""
+            }
+        }
+    }
+
+    func testSimpleHDATakesPrecedenceAndPreservesCodecDetails() {
+        let appleALC = collector(simpleHDAOutput: "").getAudioInfo()
+        let simpleHDA = collector(
+            simpleHDAOutput: "+-o SimpleHDA  <class SimpleHDA, registered, matched, active>"
+        ).getAudioInfo()
+
+        XCTAssertEqual(simpleHDA.driver, "SimpleHDA")
+        XCTAssertEqual(simpleHDA.codecName, "Realtek ALC1220")
+        XCTAssertEqual(simpleHDA.layoutId, "7")
+        XCTAssertEqual(simpleHDA.codecName, appleALC.codecName)
+        XCTAssertEqual(simpleHDA.vendorName, appleALC.vendorName)
+        XCTAssertEqual(simpleHDA.deviceName, appleALC.deviceName)
+        XCTAssertEqual(simpleHDA.layoutId, appleALC.layoutId)
+        XCTAssertEqual(simpleHDA.codecHex, appleALC.codecHex)
+        XCTAssertEqual(simpleHDA.vendorHex, appleALC.vendorHex)
+        XCTAssertEqual(simpleHDA.deviceHex, appleALC.deviceHex)
+    }
+
+    func testMissingSimpleHDAKeepsAppleALC() {
+        for output in ["", " \n\t"] {
+            XCTAssertEqual(collector(simpleHDAOutput: output).getAudioInfo().driver, "AppleALC")
+        }
+    }
+
+    func testDefaultUSBAudioKeepsPriorityOverSimpleHDA() {
+        let info = collector(
+            simpleHDAOutput: "+-o SimpleHDA  <class SimpleHDA>",
+            audioOutput: """
+            Audio:
+                  USB Speakers:
+                    Default Output Device: Yes
+                    Transport: USB
+                    Manufacturer: Test Vendor
+            """
+        ).getAudioInfo()
+
+        XCTAssertEqual(info.driver, "USB")
+        XCTAssertEqual(info.codecName, "USB Speakers")
+    }
+
+    func testSimpleHDADoesNotReplaceUnrelatedAudioFallback() {
+        let info = collector(
+            simpleHDAOutput: "+-o SimpleHDA  <class SimpleHDA>", codecOutput: ""
+        ).getAudioInfo()
+        XCTAssertNotEqual(info.driver, "SimpleHDA")
+    }
+
+    func testSimpleHDAIsRecognizedForAudioTabVisibility() {
+        for driver in ["AppleALC", "SimpleHDA", "HDAUniversal", "VoodooHDA", "USB", "HDMI", "DisplayPort"] {
+            XCTAssertTrue(AppState.hackintoshAudioDrivers.contains(driver))
+        }
+        XCTAssertFalse(AppState.hackintoshAudioDrivers.contains(""))
     }
 }
 
@@ -260,36 +284,18 @@ final class LocalizationTests: XCTestCase {
 
         for language in ["de", "es", "fr", "it", "ru"] {
             let other = try localizationKeys(for: language, in: bundle)
-            XCTAssertEqual(
-                english.subtracting(other),
-                [],
-                "Keys missing in \(language)"
-            )
-            XCTAssertEqual(
-                other.subtracting(english),
-                [],
-                "Extra keys in \(language)"
-            )
+            XCTAssertEqual(english.subtracting(other), [], "Keys missing in \(language)")
+            XCTAssertEqual(other.subtracting(english), [], "Extra keys in \(language)")
         }
     }
 
-    private func localizationKeys(for language: String, in bundle: Bundle)
-        throws -> Set<String>
-    {
+    private func localizationKeys(for language: String, in bundle: Bundle) throws -> Set<String> {
         let path = try XCTUnwrap(
-            bundle.path(
-                forResource: "Localizable",
-                ofType: "strings",
-                inDirectory: nil,
-                forLocalization: language
-            ),
+            bundle.path(forResource: "Localizable", ofType: "strings", inDirectory: nil, forLocalization: language),
             "Missing Localizable.strings for \(language)"
         )
         let data = try Data(contentsOf: URL(fileURLWithPath: path))
-        let propertyList = try PropertyListSerialization.propertyList(
-            from: data,
-            format: nil
-        )
+        let propertyList = try PropertyListSerialization.propertyList(from: data, format: nil)
         let strings = try XCTUnwrap(propertyList as? [String: String])
         return Set(strings.keys)
     }
@@ -299,13 +305,9 @@ final class LiveHardwareTests: XCTestCase {
     override func setUpWithError() throws {
         try super.setUpWithError()
         let loaded = NSPredicate { _, _ in AppState.shared.isDataLoaded }
-        let expectation = XCTNSPredicateExpectation(
-            predicate: loaded,
-            object: nil
-        )
+        let expectation = XCTNSPredicateExpectation(predicate: loaded, object: nil)
         XCTAssertEqual(
-            XCTWaiter.wait(for: [expectation], timeout: 60),
-            .completed,
+            XCTWaiter.wait(for: [expectation], timeout: 60), .completed,
             "Hardware collection and app state initialization did not finish"
         )
     }
@@ -329,17 +331,15 @@ final class LiveHardwareTests: XCTestCase {
         )
 
         let audio = HCAudio.shared.getAudioInfo()
-        XCTAssertFalse(
-            [
-                audio.codecName,
-                audio.vendorName,
-                audio.deviceName,
-                audio.layoutId,
-                audio.driver,
-                audio.codecHex,
-                audio.vendorHex,
-                audio.deviceHex,
-            ].allSatisfy(\.isEmpty)
-        )
+        XCTAssertFalse([
+            audio.codecName,
+            audio.vendorName,
+            audio.deviceName,
+            audio.layoutId,
+            audio.driver,
+            audio.codecHex,
+            audio.vendorHex,
+            audio.deviceHex,
+        ].allSatisfy(\.isEmpty))
     }
 }

@@ -1,12 +1,18 @@
 # Releases Changelog
 
-## 5.1.1 - Oct 20,2026
+## 5.1.2 - Oct 20, 2026
+
+**Fix SimpleHDA**
+
+- Display SimpleHDA as audio driver when it's installed
+
+## 5.1.1 - Oct 20, 2026
 
 **Fix Unknown in GPU name**
 
 - Fix for GPUs not exposed by Metal or reported with blank/Unknown names (such as `Intel(R) KBL Unknown`)
 
-## 5.1.0 - Oct 19,2026
+## 5.1.0 - Oct 19, 2026
 
 **Add XCTest**
 

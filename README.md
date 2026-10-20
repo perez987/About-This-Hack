@@ -80,6 +80,8 @@ The Audio tab is displayed in these situations:
 - USB audio
 - HDMI or DisplayPort audio.
 
+When SimpleHDA is active alongside AppleALC, the integrated audio driver is shown as SimpleHDA. Codec, vendor, device, and layout information still come from the existing audio registry data. USB, HDMI, and DisplayPort default outputs retain priority.
+
 **Note**: `getdump` is a tool available in the VoodooHDA repository. The download link is usually found in the resources section of each VoodooHDA release. The latest version is available at this [link](https://github.com/CloverHackyColor/VoodooHDA/releases/download/Release312/getdump.zip). VoodooHDA users must have `getdump` installed to get the audio tab. Simply copy the tool to `/usr/local/bin` and that's all.
 
 ## Support
@@ -140,7 +142,7 @@ Open `About This Hack.xcodeproj` in Xcode and run the **About This Hack** scheme
 xcodebuild test -project "About This Hack.xcodeproj" -scheme "About This Hack" -destination platform=macOS
 ```
 
-The tests cover processor and bootloader formatting, GPU name fallback and per-adapter PCI matching, version comparison, matching localization keys across languages, and a quick check that each hardware collector returns a value on the current Mac.
+The tests cover processor and bootloader formatting, GPU name fallback and per-adapter PCI matching, SimpleHDA driver precedence and audio tab recognition, version comparison, matching localization keys across languages, and a quick check that each hardware collector returns a value on the current Mac.
 
 ## Credits
 
