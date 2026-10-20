@@ -1,5 +1,23 @@
 # Releases Changelog
 
+## 5.1.1 - Oct 20,2026
+
+**Fix Unknown in GPU name**
+
+- Fix for GPUs not exposed by Metal or reported with blank/Unknown names (such as `Intel(R) KBL Unknown`)
+
+## 5.1.0 - Oct 19,2026
+
+**Add XCTest**
+
+- Add macOS XCTest target and coverage
+
+## 5.0.8 - Oct 15, 2026
+
+**Audio tab visibility**
+
+- Fix: ensure the Audio tab is displayed from the startup
+
 ## 5.0.7 - Oct 14, 2026
 
 **Speed up initial load**
