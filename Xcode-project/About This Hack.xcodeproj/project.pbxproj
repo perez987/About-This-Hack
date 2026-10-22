@@ -28,7 +28,6 @@
 		D903343B2F7F00AE000528E8 /* HCAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = D903343A2F7F00AE000528E8 /* HCAudio.swift */; };
 		D99B37092F1010F400B71FAE /* SettingsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99B37082F1010F400B71FAE /* SettingsWindowController.swift */; };
 		D99B370B2F10110C00B71FAE /* CustomLogoConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99B370A2F10110C00B71FAE /* CustomLogoConstants.swift */; };
-		D9A1F94B301CFEDB00CAC1F6 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = D9A1F94A301CFEDB00CAC1F6 /* Sparkle */; };
 		D9BA05882FA7B63900D73D31 /* UpdateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9BA05872FA7B62F00D73D31 /* UpdateController.swift */; };
 		D9E195DA2F1184F5009E9F91 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E195D92F1184F5009E9F91 /* SettingsView.swift */; };
 		DC6870462A63334400CAD908 /* HCVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6870452A63334400CAD908 /* HCVersion.swift */; };
@@ -53,7 +52,7 @@
 			containerPortal = 115D920626D6F65500F5DF35 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 115D920D26D6F65500F5DF35;
-			remoteInfo = "About This Hack";
+			remoteInfo = "About This Hack-glass";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -124,7 +123,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D9A1F94B301CFEDB00CAC1F6 /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -268,7 +266,6 @@
 			);
 			name = "About This Hack";
 			packageProductDependencies = (
-				D9A1F94A301CFEDB00CAC1F6 /* Sparkle */,
 			);
 			productName = "About This Hack";
 			productReference = 115D920E26D6F65500F5DF35 /* About This Hack.app */;
@@ -326,7 +323,6 @@
 			);
 			mainGroup = 115D920526D6F65500F5DF35;
 			packageReferences = (
-				D9A1F949301CFEDB00CAC1F6 /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			productRefGroup = 115D920F26D6F65500F5DF35 /* Products */;
 			projectDirPath = "";
@@ -638,7 +634,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.0xCUBE.About-This-Hack.Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 6.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/About This Hack.app/Contents/MacOS/About This Hack";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/About This Hack-glass.app/Contents/MacOS/About This Hack-glass";
 			};
 			name = Debug;
 		};
@@ -652,7 +648,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.0xCUBE.About-This-Hack.Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 6.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/About This Hack.app/Contents/MacOS/About This Hack";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/About This Hack-glass.app/Contents/MacOS/About This Hack-glass";
 			};
 			name = Release;
 		};
@@ -687,25 +683,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		D9A1F949301CFEDB00CAC1F6 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/sparkle-project/Sparkle";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.9.4;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		D9A1F94A301CFEDB00CAC1F6 /* Sparkle */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = D9A1F949301CFEDB00CAC1F6 /* XCRemoteSwiftPackageReference "Sparkle" */;
-			productName = Sparkle;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 115D920626D6F65500F5DF35 /* Project object */;
 }

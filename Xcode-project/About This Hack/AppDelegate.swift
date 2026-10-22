@@ -5,7 +5,6 @@
 
 import Cocoa
 import Foundation
-import Sparkle
 import SwiftUI
 
 @main
@@ -26,8 +25,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
 
     private var mainWindow: NSWindow?
     private var settingsWindowController: SettingsWindowController?
-    private var languageSelectorWindowController:
-        LanguageSelectorWindowController?
+    private var languageSelectorWindowController: LanguageSelectorWindowController?
     private var updaterController: UpdaterController?
 
     // END: - Properties -----------------------------------------
@@ -48,6 +46,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
         AppState.shared.startLoading()
         createAndShowMainWindow()
         insertLanguageMenu()
+        updaterController?.startAutomaticChecks()
     }
 
     func applicationWillTerminate(_: Notification) {
@@ -59,9 +58,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
         true
     }
 
-    func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication)
-        -> Bool
-    {
+    func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {
         true
     }
 
@@ -75,10 +72,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
 
         let window = NSWindow(
             contentRect: contentRect,
-            styleMask: [
-                .titled, .closable, .miniaturizable, .resizable,
-                .fullSizeContentView,
-            ],
+            styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
@@ -91,9 +85,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
         // Enable transparent liquid-glass style (Tahoe): the SwiftUI content
         // supplies material backgrounds (.regularMaterial / .ultraThinMaterial),
         // so the window itself is kept transparent and non-opaque.
-        //        window.isOpaque = false
-        //        window.backgroundColor = .clear
-        //        window.titlebarAppearsTransparent = true
+//        window.isOpaque = false
+//        window.backgroundColor = .clear
+//        window.titlebarAppearsTransparent = true
 
         // END: transparent window -----------------------------------------
 
@@ -105,8 +99,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
         }
 
         // Host the SwiftUI ContentView.
-        let hosting = NSHostingController(
-            rootView: ContentView().environmentObject(AppState.shared))
+        let hosting = NSHostingController(rootView: ContentView().environmentObject(AppState.shared))
         window.contentViewController = hosting
 
         // Save frame on move / resize.
@@ -118,8 +111,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
             }
         }
         NotificationCenter.default.addObserver(
-            forName: NSWindow.didResizeNotification, object: window,
-            queue: .main
+            forName: NSWindow.didResizeNotification, object: window, queue: .main
         ) { [weak window] _ in
             MainActor.assumeIsolated {
                 if let f = window?.frame { AppState.shared.saveWindowFrame(f) }
@@ -185,8 +177,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
 
     @IBAction func showLanguageSelector(_: Any) {
         if languageSelectorWindowController == nil {
-            languageSelectorWindowController =
-                LanguageSelectorWindowController()
+            languageSelectorWindowController = LanguageSelectorWindowController()
         }
         languageSelectorWindowController?.parentWindow = mainWindow
         print("Opening language selector")
@@ -197,15 +188,23 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
 
     // END: - Language Selector -----------------------------------------
 
-    // MARK: - Sparkle Updates -----------------------------------------
+    // MARK: - App Updates -----------------------------------------
 
     @IBAction func checkForUpdates(_: Any) {
         updaterController?.checkForUpdates()
     }
 
+    @IBAction func toggleAutomaticUpdates(_: Any) {
+        updaterController?.toggleAutomaticChecks()
+    }
+
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         if menuItem.action == #selector(checkForUpdates(_:)) {
             return updaterController?.canCheckForUpdates ?? false
+        }
+        if menuItem.action == #selector(toggleAutomaticUpdates(_:)) {
+            menuItem.state = updaterController?.automaticallyChecksForUpdates == true ? .on : .off
+            return true
         }
         if menuItem.action == #selector(showAudio(_:)) {
             return AppState.shared.shouldShowAudioTab
@@ -213,7 +212,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
         return true
     }
 
-    // END: - Sparkle Updates -----------------------------------------
+    // END: - App Updates -----------------------------------------
 
     // MARK: - Main Menu -----------------------------------------
 
@@ -222,37 +221,34 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
 
         // Apple menu
         let appMenuItem = NSMenuItem()
-        let appMenu = NSMenu(
-            title: NSLocalizedString(
-                "menu.app.title", comment: "App menu title"))
+        let appMenu = NSMenu(title: NSLocalizedString("menu.app.title", comment: "App menu title"))
 
-        appMenu.addItem(
-            NSMenuItem(
-                title: NSLocalizedString(
-                    "menu.app.about", comment: "About app"),
-                action: #selector(
-                    NSApplication.orderFrontStandardAboutPanel(_:)),
-                keyEquivalent: ""
-            ))
+        appMenu.addItem(NSMenuItem(
+            title: NSLocalizedString("menu.app.about", comment: "About app"),
+            action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)),
+            keyEquivalent: ""
+        ))
         appMenu.addItem(.separator())
 
         let checkForUpdatesItem = NSMenuItem(
-            title: NSLocalizedString(
-                "Check for Updates...",
-                comment: "Menu item to check for app updates"),
+            title: NSLocalizedString("Check for Updates...", comment: "Menu item to check for app updates"),
             action: #selector(checkForUpdates(_:)),
             keyEquivalent: "u"
         )
         checkForUpdatesItem.target = self
-        checkForUpdatesItem.image = NSImage(
-            systemSymbolName: "arrow.triangle.2.circlepath",
-            accessibilityDescription: nil)
+        checkForUpdatesItem.image = NSImage(systemSymbolName: "arrow.triangle.2.circlepath", accessibilityDescription: nil)
         appMenu.addItem(checkForUpdatesItem)
+        let automaticUpdatesItem = NSMenuItem(
+            title: NSLocalizedString("update.automatic", comment: "Enable automatic update checks"),
+            action: #selector(toggleAutomaticUpdates(_:)),
+            keyEquivalent: ""
+        )
+        automaticUpdatesItem.target = self
+        appMenu.addItem(automaticUpdatesItem)
         appMenu.addItem(.separator())
 
         let prefsItem = NSMenuItem(
-            title: NSLocalizedString(
-                "menu.app.preferences", comment: "Preferences"),
+            title: NSLocalizedString("menu.app.preferences", comment: "Preferences"),
             action: #selector(showSettings(_:)),
             keyEquivalent: ","
         )
@@ -265,79 +261,65 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
             action: nil,
             keyEquivalent: ""
         )
-        let servicesMenu = NSMenu(
-            title: NSLocalizedString("menu.app.services", comment: "Services"))
+        let servicesMenu = NSMenu(title: NSLocalizedString("menu.app.services", comment: "Services"))
         servicesItem.submenu = servicesMenu
         NSApp.servicesMenu = servicesMenu
         appMenu.addItem(servicesItem)
         appMenu.addItem(.separator())
 
-        appMenu.addItem(
-            NSMenuItem(
-                title: NSLocalizedString("menu.app.hide", comment: "Hide app"),
-                action: #selector(NSApplication.hide(_:)),
-                keyEquivalent: "h"
-            ))
+        appMenu.addItem(NSMenuItem(
+            title: NSLocalizedString("menu.app.hide", comment: "Hide app"),
+            action: #selector(NSApplication.hide(_:)),
+            keyEquivalent: "h"
+        ))
 
         let hideOthersItem = NSMenuItem(
-            title: NSLocalizedString(
-                "menu.app.hide_others", comment: "Hide Others"),
+            title: NSLocalizedString("menu.app.hide_others", comment: "Hide Others"),
             action: #selector(NSApplication.hideOtherApplications(_:)),
             keyEquivalent: "h"
         )
         hideOthersItem.keyEquivalentModifierMask = [.option, .command]
         appMenu.addItem(hideOthersItem)
 
-        appMenu.addItem(
-            NSMenuItem(
-                title: NSLocalizedString(
-                    "menu.app.show_all", comment: "Show All"),
-                action: #selector(NSApplication.unhideAllApplications(_:)),
-                keyEquivalent: ""
-            ))
+        appMenu.addItem(NSMenuItem(
+            title: NSLocalizedString("menu.app.show_all", comment: "Show All"),
+            action: #selector(NSApplication.unhideAllApplications(_:)),
+            keyEquivalent: ""
+        ))
         appMenu.addItem(.separator())
 
-        appMenu.addItem(
-            NSMenuItem(
-                title: NSLocalizedString("menu.app.quit", comment: "Quit app"),
-                action: #selector(NSApplication.terminate(_:)),
-                keyEquivalent: "q"
-            ))
+        appMenu.addItem(NSMenuItem(
+            title: NSLocalizedString("menu.app.quit", comment: "Quit app"),
+            action: #selector(NSApplication.terminate(_:)),
+            keyEquivalent: "q"
+        ))
 
         appMenuItem.submenu = appMenu
         mainMenu.addItem(appMenuItem)
 
         // Window menu
         let windowMenuItem = NSMenuItem()
-        windowMenuItem.title = NSLocalizedString(
-            "menu.window.title", comment: "Window menu title")
-        let windowMenu = NSMenu(
-            title: NSLocalizedString(
-                "menu.window.title", comment: "Window menu title"))
+        windowMenuItem.title = NSLocalizedString("menu.window.title", comment: "Window menu title")
+        let windowMenu = NSMenu(title: NSLocalizedString("menu.window.title", comment: "Window menu title"))
 
-        windowMenu.addItem(
-            NSMenuItem(
-                title: NSLocalizedString(
-                    "menu.window.minimize", comment: "Minimize"),
-                action: #selector(NSWindow.performMiniaturize(_:)),
-                keyEquivalent: "m"
-            ))
-        windowMenu.addItem(
-            NSMenuItem(
-                title: NSLocalizedString("menu.window.close", comment: "Close"),
-                action: #selector(NSWindow.performClose(_:)),
-                keyEquivalent: "w"
-            ))
-        windowMenu.addItem(
-            NSMenuItem(
-                title: NSLocalizedString("menu.window.zoom", comment: "Zoom"),
-                action: #selector(NSWindow.performZoom(_:)),
-                keyEquivalent: ""
-            ))
+        windowMenu.addItem(NSMenuItem(
+            title: NSLocalizedString("menu.window.minimize", comment: "Minimize"),
+            action: #selector(NSWindow.performMiniaturize(_:)),
+            keyEquivalent: "m"
+        ))
+        windowMenu.addItem(NSMenuItem(
+            title: NSLocalizedString("menu.window.close", comment: "Close"),
+            action: #selector(NSWindow.performClose(_:)),
+            keyEquivalent: "w"
+        ))
+        windowMenu.addItem(NSMenuItem(
+            title: NSLocalizedString("menu.window.zoom", comment: "Zoom"),
+            action: #selector(NSWindow.performZoom(_:)),
+            keyEquivalent: ""
+        ))
 
         let overviewItem = NSMenuItem(
-            title: NSLocalizedString(
-                "menu.window.overview", comment: "Overview"),
+            title: NSLocalizedString("menu.window.overview", comment: "Overview"),
             action: #selector(showOverview(_:)),
             keyEquivalent: "1"
         )
@@ -345,8 +327,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
         windowMenu.addItem(overviewItem)
 
         let displaysItem = NSMenuItem(
-            title: NSLocalizedString(
-                "menu.window.displays", comment: "Displays"),
+            title: NSLocalizedString("menu.window.displays", comment: "Displays"),
             action: #selector(showDisplays(_:)),
             keyEquivalent: "2"
         )
@@ -378,14 +359,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
         windowMenu.addItem(supportItem)
 
         windowMenu.addItem(.separator())
-        windowMenu.addItem(
-            NSMenuItem(
-                title: NSLocalizedString(
-                    "menu.window.bring_all_to_front",
-                    comment: "Bring All to Front"),
-                action: #selector(NSApplication.arrangeInFront(_:)),
-                keyEquivalent: ""
-            ))
+        windowMenu.addItem(NSMenuItem(
+            title: NSLocalizedString("menu.window.bring_all_to_front", comment: "Bring All to Front"),
+            action: #selector(NSApplication.arrangeInFront(_:)),
+            keyEquivalent: ""
+        ))
 
         windowMenuItem.submenu = windowMenu
         mainMenu.addItem(windowMenuItem)
@@ -393,19 +371,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
 
         // Help menu
         let helpMenuItem = NSMenuItem()
-        helpMenuItem.title = NSLocalizedString(
-            "menu.help.title", comment: "Help menu title")
-        let helpMenu = NSMenu(
-            title: NSLocalizedString(
-                "menu.help.title", comment: "Help menu title"))
+        helpMenuItem.title = NSLocalizedString("menu.help.title", comment: "Help menu title")
+        let helpMenu = NSMenu(title: NSLocalizedString("menu.help.title", comment: "Help menu title"))
 
-        helpMenu.addItem(
-            NSMenuItem(
-                title: NSLocalizedString(
-                    "menu.help.ath_help", comment: "About This Hack Help"),
-                action: #selector(NSApplication.showHelp(_:)),
-                keyEquivalent: "?"
-            ))
+        helpMenu.addItem(NSMenuItem(
+            title: NSLocalizedString("menu.help.ath_help", comment: "About This Hack Help"),
+            action: #selector(NSApplication.showHelp(_:)),
+            keyEquivalent: "?"
+        ))
 
         helpMenuItem.submenu = helpMenu
         mainMenu.addItem(helpMenuItem)
@@ -423,9 +396,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
 
         // Build "Select Language…" submenu item with Cmd+L
         let selectItem = NSMenuItem(
-            title: NSLocalizedString(
-                "Select Language menu item",
-                comment: "Select Language menu item"),
+            title: NSLocalizedString("Select Language menu item", comment: "Select Language menu item"),
             action: #selector(showLanguageSelector(_:)),
             keyEquivalent: "l"
         )
@@ -434,20 +405,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
 
         // Build the Language submenu
         let languageSubmenu = NSMenu(
-            title: NSLocalizedString(
-                "Language menu", comment: "Language menu title")
+            title: NSLocalizedString("Language menu", comment: "Language menu title")
         )
         languageSubmenu.addItem(selectItem)
 
         // Build the top-level Language menu item
         let languageMenuItem = NSMenuItem()
-        languageMenuItem.title = NSLocalizedString(
-            "Language menu", comment: "Language menu title")
+        languageMenuItem.title = NSLocalizedString("Language menu", comment: "Language menu title")
         languageMenuItem.submenu = languageSubmenu
 
         // Insert between "About This Hack" (index 0) and "Window"
-        let windowIndex =
-            mainMenu.items.firstIndex { $0.title == "Window" } ?? 1
+        let windowIndex = mainMenu.items.firstIndex { $0.title == "Window" } ?? 1
         mainMenu.insertItem(languageMenuItem, at: windowIndex)
     }
 

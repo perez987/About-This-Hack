@@ -123,7 +123,29 @@
 "menu.help.title" = "Ayuda";
 "menu.help.ath_help" = "Ayuda de About This Hack";
 
-/* Sparkle updater */
+/* Native updater */
+"update.title" = "Actualización de software";
+"update.consent" = "¿Buscar actualizaciones automáticamente?";
+"update.consentDetail" = "¿Permitir que About This Hack busque actualizaciones semanalmente? La descarga y la instalación siempre requieren tu aprobación.";
+"update.allow" = "Permitir";
+"update.notNow" = "Ahora no";
+"update.install" = "Descargar e instalar";
+"update.skip" = "Omitir esta versión";
+"update.cancel" = "Cancelar";
+"update.available" = "Hay una actualización disponible.";
+"update.availableDetail" = "La versión %@ (compilación %@) está disponible. ¿Descargarla e instalarla ahora?";
+"update.current" = "Estás al día.";
+"update.failed" = "No se ha podido completar la actualización.";
+"update.manual" = "Descarga la edición glass desde las versiones de GitHub del proyecto e instálala manualmente.";
+"update.unsigned" = "La instalación automática no está disponible porque esta copia no está firmada con una identidad de desarrollador verificable.";
+"update.destination" = "No se puede actualizar la app en su ubicación actual. Muévela a una carpeta Aplicaciones con permiso de escritura e inténtalo de nuevo.";
+"update.invalid" = "La actualización no ha superado la verificación de autenticidad o integridad.";
+"update.network" = "No se ha podido contactar con el servidor de actualizaciones o ha devuelto una respuesta no válida.";
+"update.progress" = "Descargando actualización…";
+"update.verifying" = "Verificando y preparando la actualización…";
+"update.ready" = "Lista para reiniciar e instalar.";
+"update.restart" = "Reiniciar e instalar";
+"update.automatic" = "Buscar actualizaciones automáticamente";
 "Check for Updates..." = "Buscar Actualizaciones...";
 
 /* Toolbar */

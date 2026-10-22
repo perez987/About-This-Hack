@@ -16,10 +16,12 @@ enum CustomLogoConstants {
     /// URL of the copy kept inside Application Support/<bundle-id>/
     /// Returns nil only if the system cannot locate the Application Support directory.
     static var savedLogoURL: URL? {
-        guard let appSupportURL = FileManager.default.urls(
-            for: .applicationSupportDirectory,
-            in: .userDomainMask
-        ).first else { return nil }
+        guard
+            let appSupportURL = FileManager.default.urls(
+                for: .applicationSupportDirectory,
+                in: .userDomainMask
+            ).first
+        else { return nil }
         let bundleDir = appSupportURL.appendingPathComponent(
             Bundle.main.bundleIdentifier ?? "AboutThisHack"
         )
