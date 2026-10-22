@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+    <channel>   
+       <item>
+            <title>Version 5.1.2</title>
+            <description></description>
+            <sparkle:version>1662</sparkle:version>
+            <sparkle:shortVersionString>5.1.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.6</sparkle:minimumSystemVersion>
+            <pubDate>Sat, 28 Mar 2026 21:24:31 +0000</pubDate>
+            <enclosure
+                url="https://github.com/perez987/About-This-Hack/releases/download/5.1.2/About.This.Hack-glass.5.1.2.dmg"
+                length="7846318"
+                sparkle:edSignature="9Uuy8p0VsRb6V+XNhKc3Q6Q7VXy3/9wSINm53Bj1JPtr/zG6lkpbMaU01+XRJmpFaOeozwLL26XikmWAMuKpBA=="
+                type="application/octet-stream"
+            />
+        </item>
+        
+    </channel>
+</rss>
