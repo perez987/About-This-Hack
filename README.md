@@ -29,7 +29,7 @@ Some will like it, some won't, and many others would have done it differently (p
 - Rework the Displays UI to enable full display counts (removed hard limit of 3); use a horizontal ScrollView if more of 3 displays are found
 - Center window content when sidebar is hidden
 - Update displays detection: remove `scr.txt` intermediary file for `SPDisplaysDataType`, `system_profiler SPDisplaysDataType` is written to `scr.txt` and then read back into the cache, the file round-trip is unnecessary
-- Dependency-free native updater with signed downloads, in-app installation and relaunch
+- Dependency-free native updater with signed downloads, in-app installation and relaunch ([more info](DOCS/Native-updater-signing.md))
 - Main version has opaque windows, but there is a version with translucent windows (`About This Hack-glass`)
 - Add audio tab with audio information (work in progress)
 - App is certified by Apple.

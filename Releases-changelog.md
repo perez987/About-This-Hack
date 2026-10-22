@@ -1,5 +1,11 @@
 # Releases Changelog
 
+## 5.1.3 - Oct 22, 2026
+
+**Native updater system**
+
+- Replace Sparkle with a native signed updater
+
 ## 5.1.2 - Oct 20, 2026
 
 **Fix SimpleHDA**
