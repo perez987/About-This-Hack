@@ -13,3 +13,11 @@ Removes the custom `ATHLogger` unified logging system in favour of plain `print`
   - URL open failure in support view
 - **Kept** lifecycle prints: `"Application starting"`, `"Application terminating"`, `"Data files created"`
 - **Removed** all `log.*` localization keys from `en/fr/es` `Localizable.strings` and cleaned up resulting empty section headers; `loading.data.message` (used in the loading window UI) is retained
+- **Added** `print("Checking for updates")` to `UpdaterController.checkForUpdates()`
+
+```swift
+func checkForUpdates() {
+    print("Checking for updates")
+    updaterController.updater.checkForUpdates()
+}
+```

@@ -123,30 +123,8 @@
 "menu.help.title" = "Help";
 "menu.help.ath_help" = "About This Hack Help";
 
-/* Native updater */
+/* Sparkle updater */
 "Check for Updates..." = "Check for Updates...";
-"update.title" = "Software Update";
-"update.consent" = "Automatically check for updates?";
-"update.consentDetail" = "Allow About This Hack to check for updates weekly? Downloads and installation always require your approval.";
-"update.allow" = "Allow";
-"update.notNow" = "Not Now";
-"update.install" = "Download and Install";
-"update.skip" = "Skip This Version";
-"update.cancel" = "Cancel";
-"update.available" = "An update is available.";
-"update.availableDetail" = "Version %@ (build %@) is available. Download and install it now?";
-"update.current" = "You’re up to date.";
-"update.failed" = "The update could not be completed.";
-"update.manual" = "Please download the glass edition from the project’s GitHub releases and install it manually.";
-"update.unsigned" = "Automatic installation is unavailable because this copy is not signed with a verifiable developer identity.";
-"update.destination" = "This app cannot be updated in its current location. Move it to a writable Applications folder and try again.";
-"update.invalid" = "The update failed authenticity or integrity verification.";
-"update.network" = "The update server could not be reached or returned an invalid response.";
-"update.progress" = "Downloading update…";
-"update.verifying" = "Verifying and preparing update…";
-"update.ready" = "Ready to restart and install.";
-"update.restart" = "Restart and Install";
-"update.automatic" = "Automatically Check for Updates";
 
 /* Toolbar */
 "toolbar.toggle_sidebar" = "Toggle Sidebar";

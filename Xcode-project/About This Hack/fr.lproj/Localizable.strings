@@ -123,29 +123,7 @@
 "menu.help.title" = "Aide";
 "menu.help.ath_help" = "Aide About This Hack";
 
-/* Native updater */
-"update.title" = "Mise à jour logicielle";
-"update.consent" = "Rechercher automatiquement les mises à jour ?";
-"update.consentDetail" = "Autoriser About This Hack à rechercher des mises à jour chaque semaine ? Le téléchargement et l’installation nécessitent toujours votre accord.";
-"update.allow" = "Autoriser";
-"update.notNow" = "Pas maintenant";
-"update.install" = "Télécharger et installer";
-"update.skip" = "Ignorer cette version";
-"update.cancel" = "Annuler";
-"update.available" = "Une mise à jour est disponible.";
-"update.availableDetail" = "La version %@ (compilation %@) est disponible. La télécharger et l’installer maintenant ?";
-"update.current" = "Vous êtes à jour.";
-"update.failed" = "La mise à jour n’a pas pu être terminée.";
-"update.manual" = "Téléchargez l’édition glass depuis les versions GitHub du projet et installez-la manuellement.";
-"update.unsigned" = "L’installation automatique n’est pas disponible car cette copie n’est pas signée avec une identité de développeur vérifiable.";
-"update.destination" = "Cette app ne peut pas être mise à jour à son emplacement actuel. Déplacez-la dans un dossier Applications accessible en écriture et réessayez.";
-"update.invalid" = "La vérification de l’authenticité ou de l’intégrité de la mise à jour a échoué.";
-"update.network" = "Le serveur de mise à jour est inaccessible ou a renvoyé une réponse non valide.";
-"update.progress" = "Téléchargement de la mise à jour…";
-"update.verifying" = "Vérification et préparation de la mise à jour…";
-"update.ready" = "Prêt à redémarrer et à installer.";
-"update.restart" = "Redémarrer et installer";
-"update.automatic" = "Rechercher automatiquement les mises à jour";
+/* Sparkle updater */
 "Check for Updates..." = "Vérifier les Mises à Jour...";
 
 /* Toolbar */

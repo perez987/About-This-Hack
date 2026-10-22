@@ -36,3 +36,7 @@ Custom logo path persists in UserDefaults. Overview tab updates via notification
 ## Custom logo screenshot
 
 ![Custom logo](../Images/Custom-logo.png)
+
+## Default logo screenshots
+
+![Default logo](../Images/Default-logo.png)

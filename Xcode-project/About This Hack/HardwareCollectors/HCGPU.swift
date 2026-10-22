@@ -35,7 +35,11 @@ final class HCGPU: @unchecked Sendable {
 
     private func computeGPUInfo() -> String {
         // Use cached data from HardwareCollector instead of file I/O
-        guard let content = HardwareCollector.shared.getCachedFileContent(InitGlobVar.scrFilePath) else {
+        guard
+            let content = HardwareCollector.shared.getCachedFileContent(
+                InitGlobVar.scrFilePath
+            )
+        else {
             print("No GPU data available from HardwareCollector")
             return ""
         }
@@ -53,16 +57,21 @@ final class HCGPU: @unchecked Sendable {
     }
 
     /// Keep adapter properties separate; display properties and other GPUs must not supply VRAM.
-    static func profilerSummary(_ content: String, selectedIdentity: PCIIdentity?) -> String {
+    static func profilerSummary(
+        _ content: String,
+        selectedIdentity: PCIIdentity?
+    ) -> String {
         var sections: [(header: String, fields: [String: String])] = []
         for line in content.components(separatedBy: .newlines) {
             let trimmed = line.trimmingCharacters(in: .whitespaces)
             if line.hasPrefix("    "), !line.hasPrefix("     "),
-               trimmed.hasSuffix(":"), trimmed.count > 1 {
+                trimmed.hasSuffix(":"), trimmed.count > 1
+            {
                 sections.append((String(trimmed.dropLast()), [:]))
             } else if !sections.isEmpty,
-                      line.hasPrefix("      "), !line.hasPrefix("       "),
-                      let colon = trimmed.firstIndex(of: ":") {
+                line.hasPrefix("      "), !line.hasPrefix("       "),
+                let colon = trimmed.firstIndex(of: ":")
+            {
                 let key = String(trimmed[..<colon])
                 let value = String(trimmed[trimmed.index(after: colon)...])
                     .trimmingCharacters(in: .whitespaces)
@@ -73,19 +82,26 @@ final class HCGPU: @unchecked Sendable {
         }
 
         func hexID(_ value: String?) -> Int? {
-            guard let value, let prefix = value.range(of: "0x", options: .caseInsensitive) else { return nil }
+            guard let value,
+                let prefix = value.range(of: "0x", options: .caseInsensitive)
+            else { return nil }
             let digits = value[prefix.upperBound...].prefix { $0.isHexDigit }
             return Int(digits, radix: 16)
         }
 
-        func summary(_ section: (header: String, fields: [String: String])) -> String {
+        func summary(_ section: (header: String, fields: [String: String]))
+            -> String
+        {
             let fields = section.fields
             var result = (fields["Chipset Model"] ?? section.header)
                 .replacingOccurrences(of: "Intel ", with: "")
                 .replacingOccurrences(of: "NVIDIA ", with: "")
                 .replacingOccurrences(of: "AMD ", with: "")
-            if let key = fields.keys.sorted().first(where: { $0.hasPrefix("VRAM") }),
-               let vram = fields[key] {
+            if let key = fields.keys.sorted().first(where: {
+                $0.hasPrefix("VRAM")
+            }),
+                let vram = fields[key]
+            {
                 result += " \(vram)"
             }
             if let metal = fields["Metal Support"] {
@@ -96,15 +112,18 @@ final class HCGPU: @unchecked Sendable {
 
         if let selectedIdentity {
             let matches = sections.filter {
-                hexID($0.fields["Vendor"]) == selectedIdentity.vendorID &&
-                    hexID($0.fields["Device ID"]) == selectedIdentity.deviceID
+                hexID($0.fields["Vendor"]) == selectedIdentity.vendorID
+                    && hexID($0.fields["Device ID"])
+                        == selectedIdentity.deviceID
             }
             if matches.count == 1 {
                 return summary(matches[0])
             }
         }
         // Without a unique PCI match, don't imply the first adapter is Metal's selected GPU.
-        return sections.map(summary).filter { !$0.isEmpty }.joined(separator: "; ")
+        return sections.map(summary).filter { !$0.isEmpty }.joined(
+            separator: "; "
+        )
     }
 
     func getGPU() -> String {
@@ -132,31 +151,53 @@ final class HCGPU: @unchecked Sendable {
 
         // High-performance internal GPUs first, then eGPUs, then integrated ones.
         // MTLCopyAllDevices does not force a GPU switch on dual-GPU MacBook Pros.
-        let rank: (any MTLDevice) -> Int = { $0.isLowPower ? 2 : ($0.isRemovable ? 1 : 0) }
+        let rank: (any MTLDevice) -> Int = {
+            $0.isLowPower ? 2 : ($0.isRemovable ? 1 : 0)
+        }
         let device = MTLCopyAllDevices()
             .sorted { rank($0) < rank($1) }
             .first
         let computed = device.flatMap { (device: any MTLDevice) -> String? in
-            guard Self.nativeSummary(name: device.name, details: []) != nil else {
-                if let vendorID = registryInt("vendor-id", registryID: device.registryID),
-                   let deviceID = registryInt("device-id", registryID: device.registryID) {
-                    selectedGPUIdentity = PCIIdentity(vendorID: vendorID, deviceID: deviceID)
+            guard Self.nativeSummary(name: device.name, details: []) != nil
+            else {
+                if let vendorID = registryInt(
+                    "vendor-id",
+                    registryID: device.registryID
+                ),
+                    let deviceID = registryInt(
+                        "device-id",
+                        registryID: device.registryID
+                    )
+                {
+                    selectedGPUIdentity = PCIIdentity(
+                        vendorID: vendorID,
+                        deviceID: deviceID
+                    )
                 }
                 return nil
             }
-            let vram = device.hasUnifiedMemory ? "" : dedicatedMemory(of: device)
-            let cores = registryInt("gpu-core-count", registryID: device.registryID).map { "\($0)-Core" } ?? ""
-            return Self.nativeSummary(name: device.name, details: [vram, cores, metalVersion(of: device)])
+            let vram =
+                device.hasUnifiedMemory ? "" : dedicatedMemory(of: device)
+            let cores =
+                registryInt("gpu-core-count", registryID: device.registryID).map
+            { "\($0)-Core" } ?? ""
+            return Self.nativeSummary(
+                name: device.name,
+                details: [vram, cores, metalVersion(of: device)]
+            )
         }
         _nativeGPU = .some(computed)
         return computed
     }
 
     static func nativeSummary(name: String?, details: [String]) -> String? {
-        guard let name, !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-              name.range(of: "Unknown", options: .caseInsensitive) == nil else { return nil }
+        guard let name,
+            !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+            name.range(of: "Unknown", options: .caseInsensitive) == nil
+        else { return nil }
         let details = details.filter { !$0.isEmpty }
-        return details.isEmpty ? name : "\(name) (\(details.joined(separator: ", ")))"
+        return details.isEmpty
+            ? name : "\(name) (\(details.joined(separator: ", ")))"
     }
 
     private func metalVersion(of device: any MTLDevice) -> String {
@@ -173,7 +214,10 @@ final class HCGPU: @unchecked Sendable {
 
     /// Exact VRAM from the GPU's registry entry, falling back to Metal's working-set estimate.
     private func dedicatedMemory(of device: any MTLDevice) -> String {
-        if let megabytes = registryInt("VRAM,totalMB", registryID: device.registryID), megabytes > 0 {
+        if let megabytes = registryInt(
+            "VRAM,totalMB",
+            registryID: device.registryID
+        ), megabytes > 0 {
             return formatMegabytes(megabytes)
         }
         let bytes = device.recommendedMaxWorkingSetSize
@@ -181,13 +225,23 @@ final class HCGPU: @unchecked Sendable {
     }
 
     private func registryInt(_ key: String, registryID: UInt64) -> Int? {
-        guard let matching = IORegistryEntryIDMatching(registryID) else { return nil }
+        guard let matching = IORegistryEntryIDMatching(registryID) else {
+            return nil
+        }
         let service = IOServiceGetMatchingService(kIOMainPortDefault, matching)
         guard service != 0 else { return nil }
         defer { IOObjectRelease(service) }
 
-        let options = IOOptionBits(kIORegistryIterateRecursively | kIORegistryIterateParents)
-        let value = IORegistryEntrySearchCFProperty(service, kIOServicePlane, key as CFString, kCFAllocatorDefault, options)
+        let options = IOOptionBits(
+            kIORegistryIterateRecursively | kIORegistryIterateParents
+        )
+        let value = IORegistryEntrySearchCFProperty(
+            service,
+            kIOServicePlane,
+            key as CFString,
+            kCFAllocatorDefault,
+            options
+        )
         if let number = value as? NSNumber {
             return number.intValue
         }
@@ -199,22 +253,29 @@ final class HCGPU: @unchecked Sendable {
 
     private func formatMegabytes(_ megabytes: Int) -> String {
         megabytes >= 1024
-            ? String(format: "%g GB", (Double(megabytes) / 1024 * 10).rounded() / 10)
+            ? String(
+                format: "%g GB",
+                (Double(megabytes) / 1024 * 10).rounded() / 10
+            )
             : "\(megabytes) MB"
     }
 
     func getGPUInfo() -> String {
         // Use cached data from HardwareCollector
-        guard let content = HardwareCollector.shared.getCachedFileContent(InitGlobVar.scrFilePath) else {
+        guard
+            let content = HardwareCollector.shared.getCachedFileContent(
+                InitGlobVar.scrFilePath
+            )
+        else {
             print("No GPU details available from HardwareCollector")
             return "Graphics\n"
         }
 
         let filteredLines = content.components(separatedBy: .newlines)
-            .filter { !$0.contains("Graphics/Displays:") &&
-                !$0.hasPrefix("      Displays:") &&
-                !$0.hasPrefix("        ") &&
-                !$0.hasPrefix("          ")
+            .filter {
+                !$0.contains("Graphics/Displays:")
+                    && !$0.hasPrefix("      Displays:")
+                    && !$0.hasPrefix("        ") && !$0.hasPrefix("          ")
             }
             .map { line in
                 line.trimmingCharacters(in: .whitespaces)

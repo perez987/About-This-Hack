@@ -7,7 +7,7 @@
 - macOS 15 (Sequoia) minimum deployment target
 - Swift 6 + SwiftUI UI (migrated from AppKit/XIB)
 - Storyboard-free (AppDelegate bootstraps everything manually)
-- Dependency-free native updater with signed DMG downloads and relaunch
+- Auto-updater via Sparkle framework (SPM dependency)
 - Localized into: English (`en`), Spanish (`es`), German (`de`), French (`fr`), Italian (`it`), Russian (`ru`)
 - Transparent/liquid-glass window style (`.ultraThinMaterial` / `.regularMaterial` backgrounds)
 
@@ -18,7 +18,7 @@
 | Language | Swift 6 |
 | UI framework | SwiftUI (macOS 15+) |
 | App lifecycle | AppKit (`NSApplicationDelegate`, no storyboard) |
-| Auto-updater | `UpdaterController` using Foundation, CryptoKit and Security |
+| Auto-updater | Sparkle via SPM package (`UpdaterController` wrapping `SPUStandardUpdaterController`) |
 | Shell execution | Custom `run(_ command: String) -> String` via `/bin/zsh` subprocess |
 | Localization | `NSLocalizedString` + `.strings` files per language |
 | Persistence | `UserDefaults.standard` (window frame, custom logo path, language) |
@@ -65,7 +65,7 @@ About-This-Hack/
     │   ├── LoadingIndicatorController.swift
     │   ├── SystemFunctions.swift      ← getSysctlValueByKey(), IOKit port helpers, Bundle ext.
     │   ├── Tooltips.swift             ← Lazy tooltip strings (expensive to compute)
-    │   ├── UpdateController.swift     ← Native update checks, verification and installation
+    │   ├── UpdateController.swift     ← Sparkle updater controller wrapper
     ├── Utilities/                     ← Small helpers
     │   ├── CustomLogoConstants.swift  ← UserDefaults key + Notification.Name
     │   ├── InsertExtension.swift      ← String/Data extensions
@@ -199,19 +199,16 @@ Assets are in `Assets.xcassets`. Notable image sets:
 - On reset, the copy is deleted from Application Support and the `UserDefaults` entry is removed.
 - A `Notification.Name.customLogoDidChange` notification is posted when the logo changes; `OverviewViewModel` listens and reloads.
 
-## Native Auto-Updater
+## Sparkle Auto-Updater
 
-- `UpdaterController` checks the existing glass appcast without a Sparkle dependency.
-- `ATHUpdateFeedURL`, `ATHUpdatePublicEDKey` and `ATHUpdateCheckInterval` in `Info.plist` configure the feed, Ed25519 public key and check interval.
-- Downloads must pass Ed25519 verification and the replacement app must satisfy the installed app's code-signing requirement and bundle identity before installation.
-- Automatic checks are opt-in; installation requires confirmation and a writable app location.
+- `UpdaterController` wraps `SPUStandardUpdaterController` from the Sparkle SPM package (2.9.3).
 - It publishes `canCheckForUpdates` so `AppDelegate.validateMenuItem` can enable/disable the menu item.
 - The "Check for Updates…" menu item (`⌘U`) calls `updaterController?.checkForUpdates()`.
 
 ## Building
 
 - Open `About This Hack.xcodeproj` in a current Xcode release with Swift 6 support.
-- No third-party Swift packages are required.
+- Xcode resolves the Sparkle SPM package automatically on first open/build.
 - Target: macOS 15+, architecture: universal (Apple Silicon + Intel).
 - The `AboutThisHackTests` XCTest target includes:
   - Formatting checks for processor and bootloader output, plus system-version comparison.
@@ -233,7 +230,7 @@ Use this checklist when starting a new session:
 3. If touching hardware data: inspect `HardwareCollector.swift` plus relevant `HardwareCollectors/HC*.swift`.
 4. If adding user-visible text: update all `Localizable.strings` files in `en/es/fr/it/de`.
 5. If adding shell/system calls: keep them off the main thread and route through `run(_:)`.
-6. If changing updater behavior: verify `Models/UpdateController.swift`, `Info.plist` and update actions in `AppDelegate`.
+6. If changing updater behavior: verify `Models/UpdateController.swift` and Sparkle wiring in `AppDelegate`.
 
 ## Task-to-File Map (fast lookup)
 
@@ -272,7 +269,7 @@ Use this checklist when starting a new session:
 | Change the Language menu | `AppDelegate.insertLanguageMenu()` – inserts a "Language" submenu (⌘L) between the main app menu and the Window menu |
 | Change global paths or URLs | `Models/InitGlobalVariables.swift` |
 | Add/edit a Localized string | All five `{lang}.lproj/Localizable.strings` |
-| Change update checker | `Models/UpdateController.swift` (native signed-DMG updater) |
+| Change update checker | `Models/UpdateController.swift` (Sparkle `SPUStandardUpdaterController`) |
 | Change window appearance | `AppDelegate.createAndShowMainWindow()` |
 | Change Settings/custom logo logic | `Views/SettingsView.swift` + `Utilities/CustomLogoConstants.swift` |
 | Change tooltip content | `Models/Tooltips.swift` |

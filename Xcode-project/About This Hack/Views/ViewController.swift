@@ -247,8 +247,7 @@ struct OverviewSnapshot {
         snapshot.cpu = HCCPU.shared.getCPU()
         // Memory needs only the fast SPMemoryDataType report (created before this call).
         // Graphics and Display come from native APIs, as upstream. These are the final
-        // values, so the rows never change after first appearance. Absent or unnamed
-        // Metal GPUs wait for the detailed snapshot before the Overview is shown.
+        // values, so the rows never change after first appearance.
         snapshot.ram = HCRAM.shared.getRam()
         snapshot.graphics = HCGPU.shared.getNativeGPU() ?? "⎯"
         snapshot.display = displaySummary
@@ -268,7 +267,7 @@ struct OverviewSnapshot {
     static func detailed(from initial: OverviewSnapshot) -> OverviewSnapshot {
         var snapshot = initial
         // Memory, Graphics and Display keep their first-paint values. system_profiler
-        // is only used for GPUs absent from Metal or with blank/Unknown Metal names.
+        // is only used for GPUs that Metal does not expose.
         if HCGPU.shared.getNativeGPU() == nil {
             snapshot.graphics = HCGPU.shared.getGPU().nilIfEmpty ?? initial.graphics
         }

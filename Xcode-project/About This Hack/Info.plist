@@ -2,12 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>ATHUpdateCheckInterval</key>
-	<integer>604800</integer>
-	<key>ATHUpdateFeedURL</key>
-	<string>https://raw.githubusercontent.com/perez987/About-This-Hack/main/appcast-ath.xml</string>
-	<key>ATHUpdatePublicEDKey</key>
-	<string>ZlKWZcBX5/V65EwhgJe0G+veSzYUiYrpJZL9dLE8vjw=</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
@@ -30,10 +24,20 @@
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>2021-2026 Alexander Skula
-2026 Emilio P Egido</string>
+2026 Emillio P Egido</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>NSQuitAlwaysKeepsWindows</key>
 	<false/>
+	<key>SUEnableSystemProfiling</key>
+	<false/>
+	<key>SUFeedURL</key>
+	<string>https://raw.githubusercontent.com/perez987/About-This-Hack/main/appcast-6.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>ZlKWZcBX5/V65EwhgJe0G+veSzYUiYrpJZL9dLE8vjw=</string>
+	<key>SUScheduledCheckInterval</key>
+	<integer>604800</integer>
+	<key>SUEnableInstallerLauncherService</key>
+	<true/>
 </dict>
 </plist>
