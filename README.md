@@ -29,7 +29,7 @@ Some will like it, some won't, and many others would have done it differently (p
 - Rework the Displays UI to enable full display counts (removed hard limit of 3); use a horizontal ScrollView if more of 3 displays are found
 - Center window content when sidebar is hidden
 - Update displays detection: remove `scr.txt` intermediary file for `SPDisplaysDataType`, `system_profiler SPDisplaysDataType` is written to `scr.txt` and then read back into the cache, the file round-trip is unnecessary
-- Replace Sparkle with a native updater using Foundation, CryptoKit, and Security
+- Dependency-free native updater with signed downloads, in-app installation and relaunch ([more info](DOCS/Native-updater-signing.md))
 - Main version has opaque windows, but there is a version with translucent windows (`About This Hack-glass`)
 - Add audio tab with audio information (work in progress)
 - App is certified by Apple.
@@ -142,15 +142,17 @@ Open `About This Hack.xcodeproj` in Xcode and run the **About This Hack** scheme
 xcodebuild test -project "About This Hack.xcodeproj" -scheme "About This Hack" -destination platform=macOS
 ```
 
-The tests cover processor and bootloader formatting, GPU name fallback and per-adapter PCI matching, SimpleHDA driver precedence and audio tab recognition, version comparison, native updater feed parsing and signature verification, matching localization keys across languages, and a quick check that each hardware collector returns a value on the current Mac.
+The tests cover processor and bootloader formatting, GPU name fallback and per-adapter PCI matching, SimpleHDA driver precedence and audio tab recognition, version comparison, matching localization keys across languages, and a quick check that each hardware collector returns a value on the current Mac. Updater regression tests cover release selection, malformed feeds, channel restrictions, signed payload integrity and bundle metadata.
 
-## Native software updates
+## App Updates
 
-**Check for Updates…** (`⌘U`) checks the standard-edition `appcast-ath.xml` feed. On first launch, the app asks whether to enable weekly automatic checks; this can be changed in **Automatically Check for Updates** in the app menu. Downloads and installation always require approval. You can skip a version, cancel a download, or restart to install a verified update.
+Use **About This Hack > Check for Updates…** (`⌘U`) to check for updates. You can also opt into periodic automatic checks; downloads and installation always require confirmation.
 
-The updater verifies the DMG's Ed25519 signature, the replacement app's bundle identity and version, its Apple code signature, and Gatekeeper approval before replacing the app. Installation requires a signed app in a writable location, normally Applications. It never installs the glass edition, and there is no Sparkle runtime dependency.
+The native updater uses Apple's Foundation, CryptoKit and Security frameworks, without Sparkle or other package dependencies. It continues to read the glass release feed at `perez987/About-This-Hack/main/appcast-6glass.xml`, so updates stay on the existing glass channel rather than switching to the opaque app or upstream releases.
 
-Release maintainers: see [Native updater: signing keys and release publishing](DOCS/Native-updater-signing.md) for the standard-edition asset names, retained signing key, legacy feed migration, and publishing the final **5.1.3 (1663)** DMG.
+Release publishing remains compatible with the existing appcast: publish a glass `.dmg` enclosure with its byte length, Ed25519 signature, build number, display version and minimum macOS version. Sign the original DMG bytes with the existing release signing key; keep that private key outside the repository. The public verification key and feed URL are configured in `Info.plist` under `ATHUpdatePublicEDKey` and `ATHUpdateFeedURL`. Keep the legacy appcasts available for older installed clients.
+
+Before installation, the updater verifies the download signature and the replacement app's code signature and bundle identity. Release builds must be signed with the same identity requirement as the installed app. Unsigned development builds cannot self-update. The app must be installed on a writable local volume (normally Applications), not running from its download DMG or App Translocation. No administrator privileges are requested, and Gatekeeper/quarantine protections are not disabled. If the installation location is not writable, install the signed release manually.
 
 ## Credits
 

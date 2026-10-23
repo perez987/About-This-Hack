@@ -27,13 +27,13 @@ The application uses Foundation, CryptoKit, and Security without a Sparkle runti
 
 For a genuinely new project with no existing release-signing key:
 
-1. Download the publishing tools from the official Sparkle binary distribution linked below
+1. Download the package `sign_update.zip` from the repo, it contains the 2 required tools from the Sparkle official binary distribution
 2. Extract it outside the source repository. Its directory contains `generate_keys` and `sign_update`
 3. Open Terminal in that extracted directory and run:
 
-   ```sh
-   ./generate_keys
-   ```
+```sh
+   ./bin/generate_keys
+```
 
 4. Allow Keychain access when requested. On a fresh setup, the tool generates an Ed25519 key pair, stores the private key in your login Keychain, and prints the public key
 5. Copy the public key into `ATHUpdatePublicEDKey` in the app's `Info.plist`. In this checkout, that file is `Xcode-project/About This Hack/Info.plist`
@@ -122,17 +122,17 @@ Use the existing appcast as the structural reference, but obtain a **new signatu
 
 The current channel is:
 
-- Native feed: `https://raw.githubusercontent.com/perez987/About-This-Hack/main/appcast-ath.xml`
-- Legacy Sparkle feed for the SwiftUI standard edition: `https://raw.githubusercontent.com/perez987/About-This-Hack/main/appcast-6.xml`
-- Downloads: `https://github.com/perez987/About-This-Hack/releases/download/VERSION/About.This.Hack.VERSION.dmg`
+- Native feed:
+  - `https://raw.githubusercontent.com/perez987/About-This-Hack/main/appcast-ath.xml`
+  - `https://raw.githubusercontent.com/perez987/About-This-Hack/main/appcast-glass-ath.xml`
+- Legacy feed for the Sparkle standard edition:
+  - `https://raw.githubusercontent.com/perez987/About-This-Hack/main/appcast-6.xml`
+  - `https://raw.githubusercontent.com/perez987/About-This-Hack/main/appcast-6glass.xml`
+- Downloads: `https://github.com/perez987/About-This-Hack/releases/download/VERSION/About.This.Hack(-glass).VERSION.dmg`
 
 Keep legacy appcasts available for older installed clients.
 
-This repository builds **About This Hack.app**, not **About This Hack-glass.app**. The updater accepts only `About.This.Hack.VERSION.dmg` assets from `perez987/About-This-Hack` releases, and expects `About This Hack.app` at the mounted DMG's root. Glass feeds, glass DMGs, and downloads hosted in `perez987/About-This-Hack-glass` are not accepted.
-
-The app reads its installed version and build from the bundle; they are not hard-coded in `UpdateController.swift`. Both Xcode build configurations use **5.1.3 (1663)**.
-
-The new `appcast-ath.xml` is initially seeded with the existing signed **5.1.2 (1662)** standard-edition entry from `appcast-6.xml`. A 5.1.3 installation will not downgrade to it. At the time of this port, only the glass 5.1.3 DMG was published, so its signature must not be reused for the standard edition. After building, notarizing, and signing the final standard 5.1.3 DMG, upload it and replace the native feed's entry with build `1663`, version `5.1.3`, its actual minimum OS, and the new signature and byte count. Publish `appcast-ath.xml` on `main` before distributing the native-updater build; update `appcast-6.xml` as well if older Sparkle clients should receive the migration release.
+This repository builds **About This Hack.app**. The updater accepts `About.This.Hack.VERSION.dmg` and `About.This.Hack-glass.VERSION.dmg` assets from `perez987/About-This-Hack` releases, and expects `About This Hack.app` or `About This Hack-glass.app` at the mounted DMG's root. The app reads its installed version and build from the bundle; they are not hard-coded in `UpdateController.swift`. 
 
 Keep the current public key and its matching private key when publishing updates for existing installations. The native updater trusts one embedded public key and has no implemented key-rotation mechanism. Simply replacing the key pair would leave older installations unable to verify newly signed downloads.
 
