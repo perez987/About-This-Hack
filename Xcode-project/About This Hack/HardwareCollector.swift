@@ -55,7 +55,9 @@ class HardwareCollector {
             return cached
         }
 
-        guard let content = try? String(contentsOfFile: path, encoding: .utf8), !content.isEmpty else {
+        guard let content = try? String(contentsOfFile: path, encoding: .utf8),
+            !content.isEmpty
+        else {
             return nil
         }
 
@@ -130,7 +132,10 @@ class HardwareCollector {
         // in NSScreen.screens on older macOS releases, but on macOS 15+ NSScreen also
         // lists them.  Taking the max ensures neither source causes a display to be
         // silently dropped.
-        numberOfDisplays = max(displayNames.isEmpty ? 0 : displayNames.count, NSScreen.screens.count)
+        numberOfDisplays = max(
+            displayNames.isEmpty ? 0 : displayNames.count,
+            NSScreen.screens.count
+        )
         (storageType, storageData, storagePercent) = getStorageInfo()
 
         // Pre-warm HCSerialNumber on the background thread.  Its lazy var reads
@@ -168,17 +173,26 @@ class HardwareCollector {
         displayNames = getDisplayNames()
         displayRes = getDisplayRes()
         displayRefreshRates = getDisplayRefreshRates()
-        numberOfDisplays = max(displayNames.isEmpty ? 0 : displayNames.count, NSScreen.screens.count)
+        numberOfDisplays = max(
+            displayNames.isEmpty ? 0 : displayNames.count,
+            NSScreen.screens.count
+        )
     }
 
     /// Extracts the pixel-dimensions portion from a resolution field value string,
     /// stripping any trailing "(…)" parenthesised annotations and "@ XX Hz" refresh-rate suffix.
     private func extractDimensions(from fieldValue: String) -> String {
-        var value = fieldValue
+        var value =
+            fieldValue
             .components(separatedBy: "(").first?
             .trimmingCharacters(in: .whitespaces) ?? ""
-        if let atRange = value.range(of: #"\s*@\s*[\d.]+ ?Hz"#, options: .regularExpression) {
-            value = String(value[..<atRange.lowerBound]).trimmingCharacters(in: .whitespaces)
+        if let atRange = value.range(
+            of: #"\s*@\s*[\d.]+ ?Hz"#,
+            options: .regularExpression
+        ) {
+            value = String(value[..<atRange.lowerBound]).trimmingCharacters(
+                in: .whitespaces
+            )
         }
         return value
     }
@@ -196,13 +210,18 @@ class HardwareCollector {
     }
 
     private func checkForBuiltInDisplay() -> Bool {
-        guard let content = getCachedFileContent(InitGlobVar.scrFilePath) else { return false }
+        guard let content = getCachedFileContent(InitGlobVar.scrFilePath) else {
+            return false
+        }
         let lower = content.lowercased()
-        return lower.contains("connection type: internal") || lower.contains("display type: built-in")
+        return lower.contains("connection type: internal")
+            || lower.contains("display type: built-in")
     }
 
     private func getDisplaySnapshots() -> [DisplaySnapshot] {
-        guard let content = getCachedFileContent(InitGlobVar.scrFilePath) else { return [] }
+        guard let content = getCachedFileContent(InitGlobVar.scrFilePath) else {
+            return []
+        }
 
         let lines = content.components(separatedBy: .newlines)
         var snapshots: [DisplaySnapshot] = []
@@ -217,24 +236,30 @@ class HardwareCollector {
                 continue
             }
 
-            let displaysIndent = line.prefix(while: { $0 == " " || $0 == "\t" }).count
+            let displaysIndent = line.prefix(while: { $0 == " " || $0 == "\t" })
+                .count
             i += 1
 
             while i < lines.count {
                 let displayLine = lines[i]
-                let displayTrimmed = displayLine.trimmingCharacters(in: .whitespaces)
+                let displayTrimmed = displayLine.trimmingCharacters(
+                    in: .whitespaces
+                )
 
                 if displayTrimmed.isEmpty {
                     i += 1
                     continue
                 }
 
-                let displayIndent = displayLine.prefix(while: { $0 == " " || $0 == "\t" }).count
+                let displayIndent = displayLine.prefix(while: {
+                    $0 == " " || $0 == "\t"
+                }).count
                 if displayIndent <= displaysIndent {
                     break
                 }
 
-                if displayTrimmed.hasSuffix(":"), !displayTrimmed.contains(": ") {
+                if displayTrimmed.hasSuffix(":"), !displayTrimmed.contains(": ")
+                {
                     let displayName = String(displayTrimmed.dropLast())
                     let blockIndent = displayIndent
                     var blockLines: [String] = []
@@ -242,14 +267,18 @@ class HardwareCollector {
 
                     while i < lines.count {
                         let blockLine = lines[i]
-                        let blockTrimmed = blockLine.trimmingCharacters(in: .whitespaces)
+                        let blockTrimmed = blockLine.trimmingCharacters(
+                            in: .whitespaces
+                        )
 
                         if blockTrimmed.isEmpty {
                             i += 1
                             continue
                         }
 
-                        let indent = blockLine.prefix(while: { $0 == " " || $0 == "\t" }).count
+                        let indent = blockLine.prefix(while: {
+                            $0 == " " || $0 == "\t"
+                        }).count
                         if indent <= blockIndent {
                             break
                         }
@@ -258,11 +287,13 @@ class HardwareCollector {
                         i += 1
                     }
 
-                    snapshots.append(DisplaySnapshot(
-                        name: displayName,
-                        resolution: displayResolution(from: blockLines),
-                        refreshRate: displayRefreshRate(from: blockLines)
-                    ))
+                    snapshots.append(
+                        DisplaySnapshot(
+                            name: displayName,
+                            resolution: displayResolution(from: blockLines),
+                            refreshRate: displayRefreshRate(from: blockLines)
+                        )
+                    )
                     continue
                 }
 
@@ -281,16 +312,20 @@ class HardwareCollector {
             let trimmed = line.trimmingCharacters(in: .whitespaces)
 
             if resolutionValue.isEmpty,
-               let resRange = trimmed.range(of: "Resolution:")
+                let resRange = trimmed.range(of: "Resolution:")
             {
-                resolutionValue = extractDimensions(from: String(trimmed[resRange.upperBound...]))
+                resolutionValue = extractDimensions(
+                    from: String(trimmed[resRange.upperBound...])
+                )
                 continue
             }
 
             if scaledResolution.isEmpty,
-               let uiRange = trimmed.range(of: "UI Looks like:")
+                let uiRange = trimmed.range(of: "UI Looks like:")
             {
-                scaledResolution = extractDimensions(from: String(trimmed[uiRange.upperBound...]))
+                scaledResolution = extractDimensions(
+                    from: String(trimmed[uiRange.upperBound...])
+                )
             }
         }
 
@@ -303,12 +338,20 @@ class HardwareCollector {
 
             for label in ["Resolution:", "UI Looks like:"] {
                 guard let range = trimmed.range(of: label) else { continue }
-                let value = String(trimmed[range.upperBound...]).trimmingCharacters(in: .whitespaces)
-                if let match = value.range(of: #"@\s*[\d.]+ ?Hz"#, options: .regularExpression) {
+                let value = String(trimmed[range.upperBound...])
+                    .trimmingCharacters(in: .whitespaces)
+                if let match = value.range(
+                    of: #"@\s*[\d.]+ ?Hz"#,
+                    options: .regularExpression
+                ) {
                     let refreshRate = String(value[match])
                         .replacingOccurrences(of: "@", with: "")
                         .trimmingCharacters(in: .whitespaces)
-                        .replacingOccurrences(of: #"(\d)Hz"#, with: "$1 Hz", options: .regularExpression)
+                        .replacingOccurrences(
+                            of: #"(\d)Hz"#,
+                            with: "$1 Hz",
+                            options: .regularExpression
+                        )
                     return normalizeRefreshRate(refreshRate)
                 }
             }
@@ -318,7 +361,8 @@ class HardwareCollector {
     }
 
     private func normalizeRefreshRate(_ refreshRate: String) -> String {
-        let numeric = refreshRate
+        let numeric =
+            refreshRate
             .replacingOccurrences(of: "Hz", with: "")
             .trimmingCharacters(in: .whitespaces)
 
@@ -336,8 +380,19 @@ class HardwareCollector {
         if let content = getCachedFileContent(InitGlobVar.bootvolnameFilePath) {
             contentStr = content
             lines = content.components(separatedBy: .newlines)
-            deviceProtocol = lines.first { $0.contains("Protocol:") }?.components(separatedBy: ":").last?.trimmingCharacters(in: .whitespaces).replacingOccurrences(of: " fabric$", with: "", options: [.regularExpression, .caseInsensitive]) ?? "Unknown"
-            deviceLocation = lines.first { $0.contains("Device Location:") }?.components(separatedBy: ":").last?.trimmingCharacters(in: .whitespaces) ?? "Unknown"
+            deviceProtocol =
+                lines.first { $0.contains("Protocol:") }?.components(
+                    separatedBy: ":"
+                ).last?.trimmingCharacters(in: .whitespaces)
+                .replacingOccurrences(
+                    of: " fabric$",
+                    with: "",
+                    options: [.regularExpression, .caseInsensitive]
+                ) ?? "Unknown"
+            deviceLocation =
+                lines.first { $0.contains("Device Location:") }?.components(
+                    separatedBy: ":"
+                ).last?.trimmingCharacters(in: .whitespaces) ?? "Unknown"
         }
 
         let isSSd = contentStr.contains("Solid State: Yes")
@@ -346,9 +401,9 @@ class HardwareCollector {
         let percentFree = String(format: "%.2f", percent * 100)
 
         let storageInfo = """
-        \(HCStartupDisk.shared.getStartupDisk()) (\(deviceLocation) \(deviceProtocol))
-        \(String(format: "%.2f", sizeGB)) GB (\(String(format: "%.2f", availableGB)) GB \(NSLocalizedString("storage.available", comment: "Available storage label")) - \(percentFree)%)
-        """
+            \(HCStartupDisk.shared.getStartupDisk()) (\(deviceLocation) \(deviceProtocol))
+            \(String(format: "%.2f", sizeGB)) GB (\(String(format: "%.2f", availableGB)) GB \(NSLocalizedString("storage.available", comment: "Available storage label")) - \(percentFree)%)
+            """
 
         return (isSSd, storageInfo, 1 - percent)
     }
@@ -358,8 +413,16 @@ class HardwareCollector {
         // "Free Space: N/A" before the real "Container Total Space:" and
         // "Container Free Space:" lines.  Skip any line whose value is "N/A"
         // so that we fall through to the Container* fields.
-        let sizeLine = lines.first { $0.contains("Total Space:") && !$0.contains("N/A") }?.components(separatedBy: ":").last?.trimmingCharacters(in: .whitespaces) ?? "0 B"
-        let availableLine = lines.first { $0.contains("Free Space:") && !$0.contains("N/A") }?.components(separatedBy: ":").last?.trimmingCharacters(in: .whitespaces) ?? "0 B"
+        let sizeLine =
+            lines.first { $0.contains("Total Space:") && !$0.contains("N/A") }?
+            .components(separatedBy: ":").last?.trimmingCharacters(
+                in: .whitespaces
+            ) ?? "0 B"
+        let availableLine =
+            lines.first { $0.contains("Free Space:") && !$0.contains("N/A") }?
+            .components(separatedBy: ":").last?.trimmingCharacters(
+                in: .whitespaces
+            ) ?? "0 B"
 
         let (size, sizeUnit) = parseSize(sizeLine)
         let (available, availableUnit) = parseSize(availableLine)
@@ -381,9 +444,12 @@ class HardwareCollector {
     private func parseStorageSizeFromURL() -> (Double, Double) {
         let bytesPerGB: Double = 1_000_000_000
         let url = URL(fileURLWithPath: "/")
-        guard let values = try? url.resourceValues(forKeys: [.volumeTotalCapacityKey, .volumeAvailableCapacityKey]),
-              let totalBytes = values.volumeTotalCapacity,
-              totalBytes > 0
+        guard
+            let values = try? url.resourceValues(forKeys: [
+                .volumeTotalCapacityKey, .volumeAvailableCapacityKey,
+            ]),
+            let totalBytes = values.volumeTotalCapacity,
+            totalBytes > 0
         else {
             return (0, 0)
         }
@@ -395,7 +461,9 @@ class HardwareCollector {
 
     private func parseSize(_ sizeString: String) -> (Double, String) {
         let components = sizeString.components(separatedBy: .whitespaces)
-        guard components.count >= 2, let size = Double(components[0]) else { return (0, "B") }
+        guard components.count >= 2, let size = Double(components[0]) else {
+            return (0, "B")
+        }
         return (size, components[1])
     }
 

@@ -35,12 +35,20 @@ struct LoadingView: View {
             ProgressView()
                 .progressViewStyle(.circular)
                 .scaleEffect(1.4)
-            Text(NSLocalizedString("loading.data.message", comment: "Loading data message"))
-                .font(.title3)
-                .foregroundColor(.secondary)
+            Text(
+                NSLocalizedString(
+                    "loading.data.message",
+                    comment: "Loading data message"
+                )
+            )
+            .font(.title3)
+            .foregroundColor(.secondary)
         }
         .padding(32)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .background(
+            .regularMaterial,
+            in: RoundedRectangle(cornerRadius: 16, style: .continuous)
+        )
         .overlay {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .stroke(Color.primary.opacity(0.1), lineWidth: 1)
@@ -73,7 +81,11 @@ private struct FakeSidebarLayout: View {
             // ── Sidebar ─────
             if appState.isSidebarVisible {
                 VStack(alignment: .leading, spacing: 2) {
-                    ForEach(AppSection.allCases.filter { appState.shouldShowAudioTab || $0 != .audio }) { section in
+                    ForEach(
+                        AppSection.allCases.filter {
+                            appState.shouldShowAudioTab || $0 != .audio
+                        }
+                    ) { section in
                         SidebarRow(
                             section: section,
                             isSelected: appState.selectedSection == section
@@ -89,10 +101,10 @@ private struct FakeSidebarLayout: View {
                 .padding(.horizontal, 8)
                 .frame(width: 185)
                 .frame(maxHeight: .infinity)
-                .background(Color(NSColor.controlBackgroundColor)) // opaque window
-//                .background(.ultraThinMaterial) // transparent window
+                .background(Color(NSColor.controlBackgroundColor))  // opaque window
+                //                .background(.ultraThinMaterial) // transparent window
                 .transition(.move(edge: .leading))
-//                Divider()
+                //                Divider()
                 .transition(.opacity)
             }
 
@@ -102,8 +114,8 @@ private struct FakeSidebarLayout: View {
                 .id(appState.selectedSection)
                 .transition(.opacity)
         }
-        .background(Color(NSColor.controlBackgroundColor)) // opaque window
-//        .background(.ultraThinMaterial) // transparent window
+        .background(Color(NSColor.controlBackgroundColor))  // opaque window
+        //        .background(.ultraThinMaterial) // transparent window
         .toolbar {
             ToolbarItem(placement: .navigation) {
                 Button {
@@ -113,7 +125,12 @@ private struct FakeSidebarLayout: View {
                 } label: {
                     Image(systemName: "sidebar.leading")
                 }
-                .help(NSLocalizedString("toolbar.toggle_sidebar", comment: "Toggle Sidebar"))
+                .help(
+                    NSLocalizedString(
+                        "toolbar.toggle_sidebar",
+                        comment: "Toggle Sidebar"
+                    )
+                )
             }
         }
     }
@@ -163,16 +180,25 @@ private struct SidebarRow: View {
     var body: some View {
         Button(action: action) {
             Label(section.title, systemImage: section.systemImage)
-                .font(.system(size: 13, weight: isSelected ? .semibold : .regular))
-                .foregroundColor(isSelected ? .primary : (isHovered ? Color.primary.opacity(0.85) : .secondary))
+                .font(
+                    .system(size: 13, weight: isSelected ? .semibold : .regular)
+                )
+                .foregroundColor(
+                    isSelected
+                        ? .primary
+                        : (isHovered ? Color.primary.opacity(0.85) : .secondary)
+                )
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.vertical, 5)
                 .padding(.horizontal, 8)
                 .background(
                     RoundedRectangle(cornerRadius: 6)
-                        .fill(isSelected
-                            ? Color.accentColor.opacity(0.18)
-                            : (isHovered ? Color.primary.opacity(0.08) : Color.clear))
+                        .fill(
+                            isSelected
+                                ? Color.accentColor.opacity(0.18)
+                                : (isHovered
+                                    ? Color.primary.opacity(0.08) : Color.clear)
+                        )
                 )
                 .overlay(alignment: .leading) {
                     Capsule()
@@ -180,7 +206,11 @@ private struct SidebarRow: View {
                         .frame(width: 3, height: 18)
                         .padding(.leading, 2)
                         .opacity(isSelected ? 1 : 0)
-                        .scaleEffect(x: 1, y: isSelected ? 1 : 0.3, anchor: .center)
+                        .scaleEffect(
+                            x: 1,
+                            y: isSelected ? 1 : 0.3,
+                            anchor: .center
+                        )
                 }
         }
         .buttonStyle(.plain)

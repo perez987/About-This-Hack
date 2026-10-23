@@ -71,7 +71,7 @@ enum UpdateSecurity {
         guard url.scheme == "https", url.user == nil, url.password == nil,
               url.port == nil, url.fragment == nil else { return false }
         return isReleaseURL(url)
-            || ["release-assets.githubusercontent.com", "objects.githubusercontent.com"].contains(url.host ?? "")
+             || ["release-assets.githubusercontent.com", "objects.githubusercontent.com", "github.com/perez987/About-This-Hack/releases/download/5.1.3/About.This.Hack-glass.5.1.3.dmg", "github.com/perez987/About-This-Hack/releases/download/5.1.3/About.This.Hack.5.1.3.dmg"].contains(url.host ?? "")
     }
 
     static func verify(data: Data, release: UpdateRelease, publicKey: Data) throws {

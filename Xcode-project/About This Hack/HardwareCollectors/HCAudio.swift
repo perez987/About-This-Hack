@@ -121,7 +121,9 @@ final class HCAudio: @unchecked Sendable {
                 vendorName: vendorName,
                 deviceName: deviceName,
                 layoutId: layoutId,
-                driver: simpleHDAOutput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                driver: simpleHDAOutput.trimmingCharacters(
+                    in: .whitespacesAndNewlines
+                ).isEmpty
                     ? "AppleALC" : "SimpleHDA",
                 codecHex: codecHex,
                 vendorHex: vendorHex,
@@ -263,9 +265,10 @@ final class HCAudio: @unchecked Sendable {
             }
         }
         // Also honour PATH in case the user placed it elsewhere.
-        let whichResult = runCommand("which getdump 2>/dev/null").trimmingCharacters(
-            in: .whitespacesAndNewlines
-        )
+        let whichResult = runCommand("which getdump 2>/dev/null")
+            .trimmingCharacters(
+                in: .whitespacesAndNewlines
+            )
         return whichResult.isEmpty ? nil : whichResult
     }
 
@@ -431,7 +434,9 @@ final class HCAudio: @unchecked Sendable {
     /// Parses `system_profiler SPAudioDataType -xml` to extract at least the
     /// audio device name and its vendor/manufacturer from CoreAudio.
     private func computeAudioInfoFromSystemProfiler() -> AudioInfo {
-        let output = runCommand("system_profiler SPAudioDataType -xml 2>/dev/null")
+        let output = runCommand(
+            "system_profiler SPAudioDataType -xml 2>/dev/null"
+        )
         guard let data = output.data(using: .utf8),
             let plist = try? PropertyListSerialization.propertyList(
                 from: data,

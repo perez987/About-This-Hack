@@ -27,7 +27,8 @@ class CreateDataFiles {
 
     /// Notification name for when data files are created
     static let dataFilesCreatedNotification = Notification.Name(
-        "DataFilesCreated")
+        "DataFilesCreated"
+    )
 
     static var dataFilesCreated: Bool {
         dataFilesState.get()
@@ -51,7 +52,9 @@ class CreateDataFiles {
                 completion()
                 // Post notification that data files are ready
                 NotificationCenter.default.post(
-                    name: dataFilesCreatedNotification, object: nil)
+                    name: dataFilesCreatedNotification,
+                    object: nil
+                )
             }
         }
     }
@@ -68,11 +71,15 @@ class CreateDataFiles {
 
         let fm = FileManager.default
         let athURL = URL(
-            fileURLWithPath: InitGlobVar.athDirectory, isDirectory: true)
+            fileURLWithPath: InitGlobVar.athDirectory,
+            isDirectory: true
+        )
         try? fm.removeItem(at: athURL)
         do {
             try fm.createDirectory(
-                at: athURL, withIntermediateDirectories: true)
+                at: athURL,
+                withIntermediateDirectories: true
+            )
         } catch {
             print("Could not create temp directory \(athURL.path): \(error)")
         }

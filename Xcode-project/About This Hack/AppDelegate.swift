@@ -106,19 +106,23 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
 
         // Host the SwiftUI ContentView.
         let hosting = NSHostingController(
-            rootView: ContentView().environmentObject(AppState.shared))
+            rootView: ContentView().environmentObject(AppState.shared)
+        )
         window.contentViewController = hosting
 
         // Save frame on move / resize.
         NotificationCenter.default.addObserver(
-            forName: NSWindow.didMoveNotification, object: window, queue: .main
+            forName: NSWindow.didMoveNotification,
+            object: window,
+            queue: .main
         ) { [weak window] _ in
             MainActor.assumeIsolated {
                 if let f = window?.frame { AppState.shared.saveWindowFrame(f) }
             }
         }
         NotificationCenter.default.addObserver(
-            forName: NSWindow.didResizeNotification, object: window,
+            forName: NSWindow.didResizeNotification,
+            object: window,
             queue: .main
         ) { [weak window] _ in
             MainActor.assumeIsolated {
@@ -212,7 +216,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
             return updaterController?.canCheckForUpdates ?? false
         }
         if menuItem.action == #selector(toggleAutomaticUpdates(_:)) {
-            menuItem.state = updaterController?.automaticallyChecksForUpdates == true ? .on : .off
+            menuItem.state =
+                updaterController?.automaticallyChecksForUpdates == true
+                ? .on : .off
             return true
         }
         if menuItem.action == #selector(showAudio(_:)) {
@@ -232,32 +238,44 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
         let appMenuItem = NSMenuItem()
         let appMenu = NSMenu(
             title: NSLocalizedString(
-                "menu.app.title", comment: "App menu title"))
+                "menu.app.title",
+                comment: "App menu title"
+            )
+        )
 
         appMenu.addItem(
             NSMenuItem(
                 title: NSLocalizedString(
-                    "menu.app.about", comment: "About app"),
+                    "menu.app.about",
+                    comment: "About app"
+                ),
                 action: #selector(
-                    NSApplication.orderFrontStandardAboutPanel(_:)),
+                    NSApplication.orderFrontStandardAboutPanel(_:)
+                ),
                 keyEquivalent: ""
-            ))
+            )
+        )
         appMenu.addItem(.separator())
 
         let checkForUpdatesItem = NSMenuItem(
             title: NSLocalizedString(
                 "Check for Updates...",
-                comment: "Menu item to check for app updates"),
+                comment: "Menu item to check for app updates"
+            ),
             action: #selector(checkForUpdates(_:)),
             keyEquivalent: "u"
         )
         checkForUpdatesItem.target = self
         checkForUpdatesItem.image = NSImage(
             systemSymbolName: "arrow.triangle.2.circlepath",
-            accessibilityDescription: nil)
+            accessibilityDescription: nil
+        )
         appMenu.addItem(checkForUpdatesItem)
         let automaticUpdatesItem = NSMenuItem(
-            title: NSLocalizedString("update.automatic", comment: "Enable automatic update checks"),
+            title: NSLocalizedString(
+                "update.automatic",
+                comment: "Enable automatic update checks"
+            ),
             action: #selector(toggleAutomaticUpdates(_:)),
             keyEquivalent: ""
         )
@@ -267,7 +285,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
 
         let prefsItem = NSMenuItem(
             title: NSLocalizedString(
-                "menu.app.preferences", comment: "Preferences"),
+                "menu.app.preferences",
+                comment: "Preferences"
+            ),
             action: #selector(showSettings(_:)),
             keyEquivalent: ","
         )
@@ -281,7 +301,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
             keyEquivalent: ""
         )
         let servicesMenu = NSMenu(
-            title: NSLocalizedString("menu.app.services", comment: "Services"))
+            title: NSLocalizedString("menu.app.services", comment: "Services")
+        )
         servicesItem.submenu = servicesMenu
         NSApp.servicesMenu = servicesMenu
         appMenu.addItem(servicesItem)
@@ -292,11 +313,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
                 title: NSLocalizedString("menu.app.hide", comment: "Hide app"),
                 action: #selector(NSApplication.hide(_:)),
                 keyEquivalent: "h"
-            ))
+            )
+        )
 
         let hideOthersItem = NSMenuItem(
             title: NSLocalizedString(
-                "menu.app.hide_others", comment: "Hide Others"),
+                "menu.app.hide_others",
+                comment: "Hide Others"
+            ),
             action: #selector(NSApplication.hideOtherApplications(_:)),
             keyEquivalent: "h"
         )
@@ -306,10 +330,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
         appMenu.addItem(
             NSMenuItem(
                 title: NSLocalizedString(
-                    "menu.app.show_all", comment: "Show All"),
+                    "menu.app.show_all",
+                    comment: "Show All"
+                ),
                 action: #selector(NSApplication.unhideAllApplications(_:)),
                 keyEquivalent: ""
-            ))
+            )
+        )
         appMenu.addItem(.separator())
 
         appMenu.addItem(
@@ -317,7 +344,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
                 title: NSLocalizedString("menu.app.quit", comment: "Quit app"),
                 action: #selector(NSApplication.terminate(_:)),
                 keyEquivalent: "q"
-            ))
+            )
+        )
 
         appMenuItem.submenu = appMenu
         mainMenu.addItem(appMenuItem)
@@ -325,34 +353,46 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
         // Window menu
         let windowMenuItem = NSMenuItem()
         windowMenuItem.title = NSLocalizedString(
-            "menu.window.title", comment: "Window menu title")
+            "menu.window.title",
+            comment: "Window menu title"
+        )
         let windowMenu = NSMenu(
             title: NSLocalizedString(
-                "menu.window.title", comment: "Window menu title"))
+                "menu.window.title",
+                comment: "Window menu title"
+            )
+        )
 
         windowMenu.addItem(
             NSMenuItem(
                 title: NSLocalizedString(
-                    "menu.window.minimize", comment: "Minimize"),
+                    "menu.window.minimize",
+                    comment: "Minimize"
+                ),
                 action: #selector(NSWindow.performMiniaturize(_:)),
                 keyEquivalent: "m"
-            ))
+            )
+        )
         windowMenu.addItem(
             NSMenuItem(
                 title: NSLocalizedString("menu.window.close", comment: "Close"),
                 action: #selector(NSWindow.performClose(_:)),
                 keyEquivalent: "w"
-            ))
+            )
+        )
         windowMenu.addItem(
             NSMenuItem(
                 title: NSLocalizedString("menu.window.zoom", comment: "Zoom"),
                 action: #selector(NSWindow.performZoom(_:)),
                 keyEquivalent: ""
-            ))
+            )
+        )
 
         let overviewItem = NSMenuItem(
             title: NSLocalizedString(
-                "menu.window.overview", comment: "Overview"),
+                "menu.window.overview",
+                comment: "Overview"
+            ),
             action: #selector(showOverview(_:)),
             keyEquivalent: "1"
         )
@@ -361,7 +401,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
 
         let displaysItem = NSMenuItem(
             title: NSLocalizedString(
-                "menu.window.displays", comment: "Displays"),
+                "menu.window.displays",
+                comment: "Displays"
+            ),
             action: #selector(showDisplays(_:)),
             keyEquivalent: "2"
         )
@@ -397,10 +439,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
             NSMenuItem(
                 title: NSLocalizedString(
                     "menu.window.bring_all_to_front",
-                    comment: "Bring All to Front"),
+                    comment: "Bring All to Front"
+                ),
                 action: #selector(NSApplication.arrangeInFront(_:)),
                 keyEquivalent: ""
-            ))
+            )
+        )
 
         windowMenuItem.submenu = windowMenu
         mainMenu.addItem(windowMenuItem)
@@ -409,18 +453,26 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
         // Help menu
         let helpMenuItem = NSMenuItem()
         helpMenuItem.title = NSLocalizedString(
-            "menu.help.title", comment: "Help menu title")
+            "menu.help.title",
+            comment: "Help menu title"
+        )
         let helpMenu = NSMenu(
             title: NSLocalizedString(
-                "menu.help.title", comment: "Help menu title"))
+                "menu.help.title",
+                comment: "Help menu title"
+            )
+        )
 
         helpMenu.addItem(
             NSMenuItem(
                 title: NSLocalizedString(
-                    "menu.help.ath_help", comment: "About This Hack Help"),
+                    "menu.help.ath_help",
+                    comment: "About This Hack Help"
+                ),
                 action: #selector(NSApplication.showHelp(_:)),
                 keyEquivalent: "?"
-            ))
+            )
+        )
 
         helpMenuItem.submenu = helpMenu
         mainMenu.addItem(helpMenuItem)
@@ -440,7 +492,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
         let selectItem = NSMenuItem(
             title: NSLocalizedString(
                 "Select Language menu item",
-                comment: "Select Language menu item"),
+                comment: "Select Language menu item"
+            ),
             action: #selector(showLanguageSelector(_:)),
             keyEquivalent: "l"
         )
@@ -450,14 +503,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
         // Build the Language submenu
         let languageSubmenu = NSMenu(
             title: NSLocalizedString(
-                "Language menu", comment: "Language menu title")
+                "Language menu",
+                comment: "Language menu title"
+            )
         )
         languageSubmenu.addItem(selectItem)
 
         // Build the top-level Language menu item
         let languageMenuItem = NSMenuItem()
         languageMenuItem.title = NSLocalizedString(
-            "Language menu", comment: "Language menu title")
+            "Language menu",
+            comment: "Language menu title"
+        )
         languageMenuItem.submenu = languageSubmenu
 
         // Insert between "About This Hack" (index 0) and "Window"
