@@ -29,11 +29,15 @@
 	<string>NSApplication</string>
 	<key>NSQuitAlwaysKeepsWindows</key>
 	<false/>
-	<key>ATHUpdateFeedURL</key>
-	<string>https://raw.githubusercontent.com/perez987/About-This-Hack/main/appcast-ath.xml</string>
-	<key>ATHUpdatePublicEDKey</key>
+	<key>SUEnableSystemProfiling</key>
+	<false/>
+	<key>SUFeedURL</key>
+	<string>https://raw.githubusercontent.com/perez987/About-This-Hack/main/appcast-6.xml</string>
+	<key>SUPublicEDKey</key>
 	<string>ZlKWZcBX5/V65EwhgJe0G+veSzYUiYrpJZL9dLE8vjw=</string>
-	<key>ATHUpdateCheckInterval</key>
+	<key>SUScheduledCheckInterval</key>
 	<integer>604800</integer>
+	<key>SUEnableInstallerLauncherService</key>
+	<true/>
 </dict>
 </plist>

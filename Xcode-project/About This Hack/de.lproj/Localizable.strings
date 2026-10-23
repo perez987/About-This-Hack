@@ -102,20 +102,20 @@
 "menu.app.about" = "About This Hack";
 "menu.app.preferences" = "Preferences";
 "menu.app.services" = "Services";
-"menu.app.hide" = "Hide About This Hack";
+"menu.app.hide" = "Hide About This Hack-glass";
 "menu.app.hide_others" = "Hide Others";
 "menu.app.show_all" = "Show All";
-"menu.app.quit" = "Quit About This Hack";
+"menu.app.quit" = "Quit About This Hack-glass";
 
 /* Main menu - App menu */
-"menu.app.title" = "About This Hack";
-"menu.app.about" = "About This Hack";
+"menu.app.title" = "About This Hack-glass";
+"menu.app.about" = "About This Hack-glass";
 "menu.app.preferences" = "Einstellungen";
 "menu.app.services" = "Dienste";
-"menu.app.hide" = "About This Hack ausblenden";
+"menu.app.hide" = "About This Hack-glass ausblenden";
 "menu.app.hide_others" = "Andere ausblenden";
 "menu.app.show_all" = "Alle einblenden";
-"menu.app.quit" = "About This Hack beenden";
+"menu.app.quit" = "About This Hack-glass beenden";
 
 /* Main menu - Window menu */
 "menu.window.title" = "Fenster";
@@ -131,31 +131,9 @@
 
 /* Main menu - Help menu */
 "menu.help.title" = "Hilfe";
-"menu.help.ath_help" = "About This Hack Hilfe";
+"menu.help.ath_help" = "About This Hack-glass Hilfe";
 
-/* Native updater */
-"update.title" = "Softwareupdate";
-"update.consent" = "Automatisch nach Updates suchen?";
-"update.consentDetail" = "Darf About This Hack wöchentlich nach Updates suchen? Downloads und Installation erfordern immer deine Zustimmung.";
-"update.allow" = "Erlauben";
-"update.notNow" = "Nicht jetzt";
-"update.install" = "Laden und installieren";
-"update.skip" = "Diese Version überspringen";
-"update.cancel" = "Abbrechen";
-"update.available" = "Ein Update ist verfügbar.";
-"update.availableDetail" = "Version %@ (Build %@) ist verfügbar. Jetzt laden und installieren?";
-"update.current" = "Du bist auf dem neuesten Stand.";
-"update.failed" = "Das Update konnte nicht abgeschlossen werden.";
-"update.manual" = "Lade About This Hack aus den GitHub-Releases des Projekts und installiere die App manuell.";
-"update.unsigned" = "Die automatische Installation ist nicht verfügbar, da diese Kopie nicht mit einer überprüfbaren Entwickleridentität signiert ist.";
-"update.destination" = "Diese App kann an ihrem aktuellen Speicherort nicht aktualisiert werden. Verschiebe sie in einen beschreibbaren Programme-Ordner und versuche es erneut.";
-"update.invalid" = "Die Echtheits- oder Integritätsprüfung des Updates ist fehlgeschlagen.";
-"update.network" = "Der Updateserver konnte nicht erreicht werden oder hat eine ungültige Antwort zurückgegeben.";
-"update.progress" = "Update wird geladen…";
-"update.verifying" = "Update wird überprüft und vorbereitet…";
-"update.ready" = "Bereit zum Neustarten und Installieren.";
-"update.restart" = "Neustarten und installieren";
-"update.automatic" = "Automatisch nach Updates suchen";
+/* Sparkle updater */
 "Check for Updates..." = "Nach Updates suchen...";
 
 /* Toolbar */

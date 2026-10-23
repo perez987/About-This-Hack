@@ -7,7 +7,7 @@
 - macOS 15 (Sequoia) minimum deployment target
 - Swift 6 + SwiftUI UI (migrated from AppKit/XIB)
 - Storyboard-free (AppDelegate bootstraps everything manually)
-- Native auto-updater via Foundation, CryptoKit, and Security (no Sparkle runtime dependency)
+- Auto-updater via Sparkle framework (SPM dependency)
 - Localized into: English (`en`), Spanish (`es`), German (`de`), French (`fr`), Italian (`it`), Russian (`ru`)
 - Transparent/liquid-glass window style (`.ultraThinMaterial` / `.regularMaterial` backgrounds)
 
@@ -18,7 +18,7 @@
 | Language | Swift 6 |
 | UI framework | SwiftUI (macOS 15+) |
 | App lifecycle | AppKit (`NSApplicationDelegate`, no storyboard) |
-| Auto-updater | Native `UpdaterController` with signed RSS appcast, Ed25519 verification, and Apple code-signing checks |
+| Auto-updater | Sparkle via SPM package (`UpdaterController` wrapping `SPUStandardUpdaterController`) |
 | Shell execution | Custom `run(_ command: String) -> String` via `/bin/zsh` subprocess |
 | Localization | `NSLocalizedString` + `.strings` files per language |
 | Persistence | `UserDefaults.standard` (window frame, custom logo path, language) |
@@ -65,7 +65,7 @@ About-This-Hack/
     │   ├── LoadingIndicatorController.swift
     │   ├── SystemFunctions.swift      ← getSysctlValueByKey(), IOKit port helpers, Bundle ext.
     │   ├── Tooltips.swift             ← Lazy tooltip strings (expensive to compute)
-    │   ├── UpdateController.swift     ← Native updater, feed parser, verification, install helper
+    │   ├── UpdateController.swift     ← Sparkle updater controller wrapper
     ├── Utilities/                     ← Small helpers
     │   ├── CustomLogoConstants.swift  ← UserDefaults key + Notification.Name
     │   ├── InsertExtension.swift      ← String/Data extensions
@@ -199,20 +199,16 @@ Assets are in `Assets.xcassets`. Notable image sets:
 - On reset, the copy is deleted from Application Support and the `UserDefaults` entry is removed.
 - A `Notification.Name.customLogoDidChange` notification is posted when the logo changes; `OverviewViewModel` listens and reloads.
 
-## Native Auto-Updater
+## Sparkle Auto-Updater
 
-- `UpdaterController` uses Foundation, CryptoKit, and Security; there is no Sparkle SPM dependency.
-- `ATHUpdateFeedURL` in `Info.plist` and `UpdateSecurity.feedURL` must both point to `https://raw.githubusercontent.com/perez987/About-This-Hack/main/appcast-ath.xml`.
-- Only `About.This.Hack.VERSION.dmg` downloads from `perez987/About-This-Hack` releases are accepted. The DMG must contain `About This Hack.app`, not the glass edition.
-- The installed version/build come from the bundle. Preserve the existing Ed25519 public key in `ATHUpdatePublicEDKey`; see `DOCS/Native-updater-signing.md` for publishing.
-- Weekly automatic checks are opt-in; downloads and installation always require approval. `AppDelegate` starts the scheduler after launching the main window.
+- `UpdaterController` wraps `SPUStandardUpdaterController` from the Sparkle SPM package (2.9.3).
 - It publishes `canCheckForUpdates` so `AppDelegate.validateMenuItem` can enable/disable the menu item.
 - The "Check for Updates…" menu item (`⌘U`) calls `updaterController?.checkForUpdates()`.
 
 ## Building
 
 - Open `About This Hack.xcodeproj` in a current Xcode release with Swift 6 support.
-- No third-party packages are required for the updater.
+- Xcode resolves the Sparkle SPM package automatically on first open/build.
 - Target: macOS 15+, architecture: universal (Apple Silicon + Intel).
 - The `AboutThisHackTests` XCTest target includes:
   - Formatting checks for processor and bootloader output, plus system-version comparison.
@@ -234,7 +230,7 @@ Use this checklist when starting a new session:
 3. If touching hardware data: inspect `HardwareCollector.swift` plus relevant `HardwareCollectors/HC*.swift`.
 4. If adding user-visible text: update all `Localizable.strings` files in `en/es/fr/it/de`.
 5. If adding shell/system calls: keep them off the main thread and route through `run(_:)`.
-6. If changing updater behavior: verify `Models/UpdateController.swift`, native update settings in `Info.plist`, and menu/scheduler wiring in `AppDelegate`.
+6. If changing updater behavior: verify `Models/UpdateController.swift` and Sparkle wiring in `AppDelegate`.
 
 ## Task-to-File Map (fast lookup)
 
@@ -273,7 +269,7 @@ Use this checklist when starting a new session:
 | Change the Language menu | `AppDelegate.insertLanguageMenu()` – inserts a "Language" submenu (⌘L) between the main app menu and the Window menu |
 | Change global paths or URLs | `Models/InitGlobalVariables.swift` |
 | Add/edit a Localized string | All five `{lang}.lproj/Localizable.strings` |
-| Change update checker | `Models/UpdateController.swift` (native updater and `UpdateSecurity` channel restrictions) |
+| Change update checker | `Models/UpdateController.swift` (Sparkle `SPUStandardUpdaterController`) |
 | Change window appearance | `AppDelegate.createAndShowMainWindow()` |
 | Change Settings/custom logo logic | `Views/SettingsView.swift` + `Utilities/CustomLogoConstants.swift` |
 | Change tooltip content | `Models/Tooltips.swift` |
