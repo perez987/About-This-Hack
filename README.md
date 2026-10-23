@@ -29,7 +29,7 @@ Some will like it, some won't, and many others would have done it differently (p
 - Rework the Displays UI to enable full display counts (removed hard limit of 3); use a horizontal ScrollView if more of 3 displays are found
 - Center window content when sidebar is hidden
 - Update displays detection: remove `scr.txt` intermediary file for `SPDisplaysDataType`, `system_profiler SPDisplaysDataType` is written to `scr.txt` and then read back into the cache, the file round-trip is unnecessary
-- Replace the custom updater system by Sparkle
+- Replace Sparkle with a native updater using Foundation, CryptoKit, and Security
 - Main version has opaque windows, but there is a version with translucent windows (`About This Hack-glass`)
 - Add audio tab with audio information (work in progress)
 - App is certified by Apple.
@@ -142,7 +142,15 @@ Open `About This Hack.xcodeproj` in Xcode and run the **About This Hack** scheme
 xcodebuild test -project "About This Hack.xcodeproj" -scheme "About This Hack" -destination platform=macOS
 ```
 
-The tests cover processor and bootloader formatting, GPU name fallback and per-adapter PCI matching, SimpleHDA driver precedence and audio tab recognition, version comparison, matching localization keys across languages, and a quick check that each hardware collector returns a value on the current Mac.
+The tests cover processor and bootloader formatting, GPU name fallback and per-adapter PCI matching, SimpleHDA driver precedence and audio tab recognition, version comparison, native updater feed parsing and signature verification, matching localization keys across languages, and a quick check that each hardware collector returns a value on the current Mac.
+
+## Native software updates
+
+**Check for Updates…** (`⌘U`) checks the standard-edition `appcast-ath.xml` feed. On first launch, the app asks whether to enable weekly automatic checks; this can be changed in **Automatically Check for Updates** in the app menu. Downloads and installation always require approval. You can skip a version, cancel a download, or restart to install a verified update.
+
+The updater verifies the DMG's Ed25519 signature, the replacement app's bundle identity and version, its Apple code signature, and Gatekeeper approval before replacing the app. Installation requires a signed app in a writable location, normally Applications. It never installs the glass edition, and there is no Sparkle runtime dependency.
+
+Release maintainers: see [Native updater: signing keys and release publishing](DOCS/Native-updater-signing.md) for the standard-edition asset names, retained signing key, legacy feed migration, and publishing the final **5.1.3 (1663)** DMG.
 
 ## Credits
 

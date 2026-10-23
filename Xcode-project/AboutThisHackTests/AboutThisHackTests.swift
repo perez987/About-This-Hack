@@ -1,5 +1,197 @@
 import XCTest
+import CryptoKit
 @testable import About_This_Hack
+
+final class NativeUpdaterTests: XCTestCase {
+    private let releaseURL = "https://github.com/perez987/About-This-Hack/releases/download/5.1.3/About.This.Hack.5.1.3.dmg"
+
+    private func item(build: String = "1663", minimumOS: String = "15.6", url: String? = nil) -> String {
+        """
+        <item>
+          <sparkle:version>\(build)</sparkle:version>
+          <sparkle:shortVersionString>5.1.3</sparkle:shortVersionString>
+          <sparkle:minimumSystemVersion>\(minimumOS)</sparkle:minimumSystemVersion>
+          <enclosure url="\(url ?? releaseURL)" length="4"
+            sparkle:edSignature="\(Data(repeating: 0, count: 64).base64EncodedString())" />
+        </item>
+        """
+    }
+
+    private func feed(_ items: String) -> Data {
+        Data("""
+        <?xml version="1.0" encoding="UTF-8"?>
+        <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+        <channel>\(items)</channel></rss>
+        """.utf8)
+    }
+
+    func testNumericBuildOrderingAndPadding() throws {
+        XCTAssertGreaterThan(try XCTUnwrap(UpdateVersion("1663")), try XCTUnwrap(UpdateVersion("999")))
+        XCTAssertGreaterThan(try XCTUnwrap(UpdateVersion("2.10")), try XCTUnwrap(UpdateVersion("2.9")))
+        XCTAssertEqual(UpdateVersion("2"), UpdateVersion("2.0.0"))
+        XCTAssertEqual(UpdateVersion("02.001"), UpdateVersion("2.1"))
+    }
+
+    func testMalformedVersionsAreRejected() {
+        for version in ["", "1.", ".1", "1..2", "-1", "+1", " 1", "1 ", "1.0-beta", "１", "18446744073709551616"] {
+            XCTAssertNil(UpdateVersion(version), version)
+        }
+    }
+
+    func testLegacySignedAppcastSelectsNewestSupportedBuild() throws {
+        let releases = try UpdateFeedParser.parse(feed(
+            item(build: "1663", minimumOS: "16") + item(build: "1661") + item(build: "1662")
+        ))
+        XCTAssertEqual(releases.count, 3)
+        XCTAssertEqual(
+            UpdateFeedParser.newest(releases, installedBuild: "1660", systemVersion: "15.6")?.build, "1662"
+        )
+        XCTAssertNil(UpdateFeedParser.newest(releases, installedBuild: "1663", systemVersion: "15.6"))
+        XCTAssertNil(UpdateFeedParser.newest(releases, installedBuild: "1660", systemVersion: "15.5"))
+        XCTAssertNil(UpdateFeedParser.newest(releases, installedBuild: "invalid", systemVersion: "16"))
+        XCTAssertEqual(
+            UpdateFeedParser.newest(
+                releases, installedBuild: "1660", systemVersion: "15.6", skippedBuild: "1662"
+            )?.build, "1661"
+        )
+    }
+
+    func testMalformedFeedItemsFailClosed() {
+        for badItem in [
+            item(build: "16beta"),
+            item(minimumOS: ""),
+            item().replacingOccurrences(of: "length=\"4\"", with: "length=\"0\""),
+            item().replacingOccurrences(of: "length=\"4\"", with: "length=\"1073741825\""),
+            item().replacingOccurrences(of: "length=\"4\"", with: "length=\"-4\""),
+            item().replacingOccurrences(of: "length=\"4\"", with: "length=\"4.0\""),
+            item().replacingOccurrences(of: Data(repeating: 0, count: 64).base64EncodedString(), with: "bad"),
+            item().replacingOccurrences(of: "</item>", with: "<sparkle:version>1700</sparkle:version></item>"),
+            item().replacingOccurrences(of: "Hack.5.1.3.dmg", with: "Hack-glass.5.1.3.dmg"),
+        ] {
+            XCTAssertThrowsError(try UpdateFeedParser.parse(feed(item() + badItem)))
+        }
+        XCTAssertThrowsError(try UpdateFeedParser.parse(Data("<rss><channel>".utf8)))
+        XCTAssertThrowsError(try UpdateFeedParser.parse(Data(repeating: 32, count: 1_048_577)))
+    }
+
+    func testFeedRejectsEntitiesAndDoctypes() {
+        let xml = """
+        <?xml version="1.0"?>
+        <!DOCTYPE rss [<!ENTITY external SYSTEM "file:///etc/passwd">]>
+        <rss><channel><item>&external;</item></channel></rss>
+        """
+        XCTAssertThrowsError(try UpdateFeedParser.parse(Data(xml.utf8)))
+    }
+
+    func testReleaseURLChannelAndOriginRestrictions() throws {
+        XCTAssertTrue(UpdateSecurity.isReleaseURL(try XCTUnwrap(URL(string: releaseURL))))
+        for address in [
+            releaseURL.replacingOccurrences(of: "https:", with: "http:"),
+            releaseURL.replacingOccurrences(of: "github.com", with: "github.com.evil.invalid"),
+            releaseURL.replacingOccurrences(of: "github.com", with: "user@github.com"),
+            releaseURL.replacingOccurrences(of: "github.com", with: "github.com:443"),
+            releaseURL.replacingOccurrences(of: "perez987", with: "another-user"),
+            releaseURL.replacingOccurrences(of: "About-This-Hack/", with: "About-This-Hack-glass/"),
+            releaseURL.replacingOccurrences(of: "Hack.5.1.3.dmg", with: "Hack-glass.5.1.3.dmg"),
+            releaseURL + "?download=1",
+            releaseURL + "#fragment",
+            releaseURL.replacingOccurrences(of: "download/5.1.3/", with: "download/../"),
+        ] {
+            XCTAssertFalse(UpdateSecurity.isReleaseURL(try XCTUnwrap(URL(string: address))), address)
+        }
+    }
+
+    func testOnlyRetainedFeedAndHTTPSAssetRedirectsAreAllowed() throws {
+        XCTAssertTrue(UpdateSecurity.isFeedURL(try XCTUnwrap(URL(string: UpdateSecurity.feedURL))))
+        XCTAssertFalse(UpdateSecurity.isFeedURL(try XCTUnwrap(URL(
+            string: UpdateSecurity.feedURL.replacingOccurrences(of: "/main/", with: "/untrusted/")
+        ))))
+        for feedName in ["appcast-glass-ath.xml", "appcast-6.xml", "appcast-6glass.xml"] {
+            XCTAssertFalse(UpdateSecurity.isFeedURL(try XCTUnwrap(URL(
+                string: UpdateSecurity.feedURL.replacingOccurrences(of: "appcast-ath.xml", with: feedName)
+            ))))
+        }
+        XCTAssertTrue(UpdateSecurity.isDownloadRedirect(try XCTUnwrap(
+            URL(string: "https://release-assets.githubusercontent.com/github-production-release-asset/file?token=value")
+        )))
+        for address in ["http://release-assets.githubusercontent.com/file",
+                        "https://release-assets.githubusercontent.com.evil.invalid/file",
+                        "https://github.com/perez987/About-This-Hack/releases/latest",
+                        "https://user@objects.githubusercontent.com/file"] {
+            XCTAssertFalse(UpdateSecurity.isDownloadRedirect(try XCTUnwrap(URL(string: address))))
+        }
+    }
+
+    func testEd25519SignatureSizeAndTampering() throws {
+        let key = Curve25519.Signing.PrivateKey()
+        let data = Data("signed disk image".utf8)
+        let signature = try key.signature(for: data)
+        let release = UpdateRelease(
+            build: "1663", version: "5.1.3", minimumOS: "15.6",
+            url: try XCTUnwrap(URL(string: releaseURL)), length: data.count, signature: signature
+        )
+        XCTAssertNoThrow(try UpdateSecurity.verify(
+            data: data, release: release, publicKey: key.publicKey.rawRepresentation
+        ))
+        XCTAssertThrowsError(try UpdateSecurity.verify(
+            data: Data("Signed disk image".utf8), release: release, publicKey: key.publicKey.rawRepresentation
+        ))
+        XCTAssertThrowsError(try UpdateSecurity.verify(
+            data: data + Data([0]), release: release, publicKey: key.publicKey.rawRepresentation
+        ))
+        XCTAssertThrowsError(try UpdateSecurity.verify(
+            data: data, release: release, publicKey: Curve25519.Signing.PrivateKey().publicKey.rawRepresentation
+        ))
+        XCTAssertThrowsError(try UpdateSecurity.verify(data: data, release: release, publicKey: Data()))
+    }
+
+    func testStagedBundleMetadataMustMatchExactly() throws {
+        let release = try XCTUnwrap(UpdateFeedParser.parse(feed(item())).first)
+        let identifier = "com.0xCUBE.About-This-Hack"
+        let info = ["CFBundleIdentifier": identifier, "CFBundleVersion": "1663",
+                    "CFBundleShortVersionString": "5.1.3"]
+        XCTAssertTrue(UpdateSecurity.metadataMatches(info, bundleIdentifier: identifier, release: release))
+        for field in info.keys {
+            var modified = info
+            modified[field] = "different"
+            XCTAssertFalse(UpdateSecurity.metadataMatches(modified, bundleIdentifier: identifier, release: release))
+            modified.removeValue(forKey: field)
+            XCTAssertFalse(UpdateSecurity.metadataMatches(modified, bundleIdentifier: identifier, release: release))
+        }
+    }
+
+    func testCandidateMinimumOSIsCheckedIndependentlyOfFeed() {
+        XCTAssertTrue(UpdateSecurity.supportsSystem(["LSMinimumSystemVersion": "15.6"], systemVersion: "15.6"))
+        XCTAssertTrue(UpdateSecurity.supportsSystem(["LSMinimumSystemVersion": "15"], systemVersion: "26.0"))
+        XCTAssertFalse(UpdateSecurity.supportsSystem(["LSMinimumSystemVersion": "26"], systemVersion: "15.6"))
+        XCTAssertFalse(UpdateSecurity.supportsSystem(["LSMinimumSystemVersion": "15.6.1"], systemVersion: "15.6"))
+        XCTAssertFalse(UpdateSecurity.supportsSystem(["LSMinimumSystemVersion": "invalid"], systemVersion: "26"))
+        XCTAssertFalse(UpdateSecurity.supportsSystem([:], systemVersion: "26"))
+    }
+
+    @MainActor
+    func testInstalledUpdaterConfigurationUsesStandardEdition() throws {
+        let bundle = Bundle(for: AppDelegate.self)
+        XCTAssertEqual(bundle.object(forInfoDictionaryKey: "ATHUpdateFeedURL") as? String, UpdateSecurity.feedURL)
+        let encoded = try XCTUnwrap(bundle.object(forInfoDictionaryKey: "ATHUpdatePublicEDKey") as? String)
+        XCTAssertEqual(Data(base64Encoded: encoded)?.count, 32)
+        XCTAssertGreaterThanOrEqual(
+            (bundle.object(forInfoDictionaryKey: "ATHUpdateCheckInterval") as? NSNumber)?.doubleValue ?? 0, 604800
+        )
+        XCTAssertNil(bundle.object(forInfoDictionaryKey: "SUFeedURL"))
+        XCTAssertNil(bundle.object(forInfoDictionaryKey: "SUPublicEDKey"))
+        XCTAssertEqual(bundle.bundleIdentifier, "com.0xCUBE.About-This-Hack")
+        XCTAssertEqual(bundle.bundleURL.lastPathComponent, "About This Hack.app")
+    }
+
+    func testFeedTagAndDisplayVersionMustMatch() {
+        let mismatched = item().replacingOccurrences(
+            of: "<sparkle:shortVersionString>5.1.3</sparkle:shortVersionString>",
+            with: "<sparkle:shortVersionString>5.1.4</sparkle:shortVersionString>"
+        )
+        XCTAssertThrowsError(try UpdateFeedParser.parse(feed(mismatched)))
+    }
+}
 
 final class FormattingTests: XCTestCase {
     func testProcessorFormatting() {
