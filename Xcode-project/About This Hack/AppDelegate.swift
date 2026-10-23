@@ -5,7 +5,6 @@
 
 import Cocoa
 import Foundation
-import Sparkle
 import SwiftUI
 
 @main
@@ -48,6 +47,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
         AppState.shared.startLoading()
         createAndShowMainWindow()
         insertLanguageMenu()
+        updaterController?.startAutomaticChecks()
     }
 
     func applicationWillTerminate(_: Notification) {
@@ -197,15 +197,23 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
 
     // END: - Language Selector -----------------------------------------
 
-    // MARK: - Sparkle Updates -----------------------------------------
+    // MARK: - App Updates -----------------------------------------
 
     @IBAction func checkForUpdates(_: Any) {
         updaterController?.checkForUpdates()
     }
 
+    @IBAction func toggleAutomaticUpdates(_: Any) {
+        updaterController?.toggleAutomaticChecks()
+    }
+
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         if menuItem.action == #selector(checkForUpdates(_:)) {
             return updaterController?.canCheckForUpdates ?? false
+        }
+        if menuItem.action == #selector(toggleAutomaticUpdates(_:)) {
+            menuItem.state = updaterController?.automaticallyChecksForUpdates == true ? .on : .off
+            return true
         }
         if menuItem.action == #selector(showAudio(_:)) {
             return AppState.shared.shouldShowAudioTab
@@ -213,7 +221,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
         return true
     }
 
-    // END: - Sparkle Updates -----------------------------------------
+    // END: - App Updates -----------------------------------------
 
     // MARK: - Main Menu -----------------------------------------
 
@@ -248,6 +256,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
             systemSymbolName: "arrow.triangle.2.circlepath",
             accessibilityDescription: nil)
         appMenu.addItem(checkForUpdatesItem)
+        let automaticUpdatesItem = NSMenuItem(
+            title: NSLocalizedString("update.automatic", comment: "Enable automatic update checks"),
+            action: #selector(toggleAutomaticUpdates(_:)),
+            keyEquivalent: ""
+        )
+        automaticUpdatesItem.target = self
+        appMenu.addItem(automaticUpdatesItem)
         appMenu.addItem(.separator())
 
         let prefsItem = NSMenuItem(
