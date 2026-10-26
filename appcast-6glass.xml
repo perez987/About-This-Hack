@@ -6,7 +6,7 @@
             <description></description>
             <sparkle:version>1662</sparkle:version>
             <sparkle:shortVersionString>5.1.2</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>15.6</sparkle:minimumSystemVersion>
+            <sparkle:minimumSystemVersion>12</sparkle:minimumSystemVersion>
             <pubDate>Sat, 28 Mar 2026 21:24:31 +0000</pubDate>
             <enclosure
                 url="https://github.com/perez987/About-This-Hack/releases/download/5.1.2/About.This.Hack-glass.5.1.2.dmg"
