@@ -2,9 +2,9 @@
 
 ## 5.1.3 - Oct 30, 2026
 
-**Downgrade target to macOS 14+**
+**Downgrade target to macOS 13+**
 
-- Minimum target is now macOS Sonoma 14.6+
+- Minimum target is now macOS Sonoma 13.5+
 - Add support for audio by eq-Mac (Bitgapp Ltd)
 
 ## 5.1.2 - Oct 20, 2026
