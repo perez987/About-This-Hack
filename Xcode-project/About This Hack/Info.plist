@@ -24,20 +24,20 @@
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>2021-2026 Alexander Skula
-2026 Emillio P Egido</string>
+2026 Emilio P Egido</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>NSQuitAlwaysKeepsWindows</key>
 	<false/>
+	<key>SUEnableInstallerLauncherService</key>
+	<true/>
 	<key>SUEnableSystemProfiling</key>
 	<false/>
 	<key>SUFeedURL</key>
-	<string>https://raw.githubusercontent.com/perez987/About-This-Hack/main/appcast-6.xml</string>
+	<string>https://raw.githubusercontent.com/perez987/About-This-Hack/main/appcast.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>ZlKWZcBX5/V65EwhgJe0G+veSzYUiYrpJZL9dLE8vjw=</string>
 	<key>SUScheduledCheckInterval</key>
 	<integer>604800</integer>
-	<key>SUEnableInstallerLauncherService</key>
-	<true/>
 </dict>
 </plist>

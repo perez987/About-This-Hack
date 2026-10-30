@@ -1,6 +1,6 @@
 # About This Hack: Your Mac's Story, Beautifully Told, now in SwiftUI
 
-![Platform](https://img.shields.io/badge/macOS-15-orange.svg)
+![Platform](https://img.shields.io/badge/macOS-14.6-orange.svg)
 ![Swift](https://img.shields.io/badge/Swift-6-blue.svg)
 ![Xcode](https://img.shields.io/badge/Xcode-26-lavender.svg)
 ![Downloads](https://img.shields.io/github/downloads/perez987/About-This-Hack/total?style=flat&label=Downloads&labelColor=Downloads)
@@ -21,7 +21,7 @@ Some will like it, some won't, and many others would have done it differently (p
 
 - Migrate main UI from AppKit-XIB to SwiftUI keeping app functionality
 - Migrate from Swift 5 to Swift 6 (WIP)
-- Minimum target is macOS 15+
+- Minimum target is macOS 14.6+
 - App bundle size has been reduced from 29 to 14 MB
 - Replace ATHLogger with print statements (error/warning prints where failures are meaningful for debugging)
 - Replace macOS version icons with liquid glass badges
@@ -131,7 +131,7 @@ The custom logo image is saved in the path `~/Library/Application Support/com.0x
 
 ## Compatibility
 
-- Supports macOS 15 Sequoia and newer
+- Supports macOS 14.6 Sonoma and newer
 - Not compatible with Linux or Windows.
 
 ## Building from Source

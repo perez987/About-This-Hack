@@ -4,7 +4,7 @@
 
 **About This Hack** is a macOS app that recreates the classic pre-Ventura "About This Mac" window with modern enhancements. It targets both Hackintosh users (PCs running macOS via OpenCore or Clover bootloaders) and real Mac users. It displays hardware info (CPU, RAM, GPU, displays, storage, audio codec), bootloader version, serial number, and support links.
 
-- macOS 15 (Sequoia) minimum deployment target
+- macOS 14 (Sonoma) minimum deployment target
 - Swift 6 + SwiftUI UI (migrated from AppKit/XIB)
 - Storyboard-free (AppDelegate bootstraps everything manually)
 - Auto-updater via Sparkle framework (SPM dependency)
@@ -16,7 +16,7 @@
 | Area | Technology |
 |---|---|
 | Language | Swift 6 |
-| UI framework | SwiftUI (macOS 15+) |
+| UI framework | SwiftUI (macOS 14+) |
 | App lifecycle | AppKit (`NSApplicationDelegate`, no storyboard) |
 | Auto-updater | Sparkle via SPM package (`UpdaterController` wrapping `SPUStandardUpdaterController`) |
 | Shell execution | Custom `run(_ command: String) -> String` via `/bin/zsh` subprocess |
@@ -209,7 +209,7 @@ Assets are in `Assets.xcassets`. Notable image sets:
 
 - Open `About This Hack.xcodeproj` in a current Xcode release with Swift 6 support.
 - Xcode resolves the Sparkle SPM package automatically on first open/build.
-- Target: macOS 15+, architecture: universal (Apple Silicon + Intel).
+- Target: macOS 14+, architecture: universal (Apple Silicon + Intel).
 - The `AboutThisHackTests` XCTest target includes:
   - Formatting checks for processor and bootloader output, plus system-version comparison.
   - Localization key parity checks across `en`, `de`, `es`, `fr`, `it`, and `ru`.

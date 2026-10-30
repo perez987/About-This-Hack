@@ -256,7 +256,12 @@ final class AudioDriverTests: XCTestCase {
     private func collector(
         simpleHDAOutput: String,
         codecOutput: String = "\"IOHDACodecVendorID\" = 283906592",
-        audioOutput: String = ""
+        audioOutput: String = "",
+        controllerOutput: String = """
+        "layout-id" = <07000000>
+        "vendor-id" = <86800000>
+        "device-id" = <70a10000>
+        """
     ) -> HCAudio {
         HCAudio { command in
             switch command {
@@ -265,11 +270,7 @@ final class AudioDriverTests: XCTestCase {
             case "ioreg -l -r -c IOHDACodecDevice -w 0 2>/dev/null":
                 return codecOutput
             case "ioreg -l -r -n HDEF -w 0 2>/dev/null":
-                return """
-                    "layout-id" = <07000000>
-                    "vendor-id" = <86800000>
-                    "device-id" = <70a10000>
-                    """
+                return controllerOutput
             case "ioreg -p IOService -r -c SimpleHDA -d 1 -w 0 2>/dev/null":
                 return simpleHDAOutput
             default:
@@ -322,6 +323,34 @@ final class AudioDriverTests: XCTestCase {
         XCTAssertEqual(info.codecName, "USB Speakers")
     }
 
+    func testEqMacOutputIncludesBuiltInCodecAndActiveLayout() {
+        let info = collector(
+            simpleHDAOutput: "",
+            codecOutput: """
+                "IOHDACodecVendorID" = 283902595
+                "IOAudioEngineDeviceDescription" = {"layout-id"=7}
+                """,
+            audioOutput: """
+                Audio:
+                        Internal Speakers (eqMac):
+                          Default Output Device: Yes
+                          Manufacturer: Bitgapp Ltd
+                          Transport: USB
+                          Output Source: Internal Speakers (eqMac)
+                """,
+            controllerOutput: """
+                "alc-layout-id" = <0f000000>
+                "layout-id" = <07000000>
+                """
+        ).getAudioInfo()
+
+        XCTAssertEqual(info.driver, "eqMac")
+        XCTAssertEqual(info.codecName, "Realtek ALC283")
+        XCTAssertEqual(info.vendorName, "Bitgapp Ltd")
+        XCTAssertEqual(info.deviceName, "Internal Speakers (eqMac)")
+        XCTAssertEqual(info.layoutId, "7")
+    }
+
     func testSimpleHDADoesNotReplaceUnrelatedAudioFallback() {
         let info = collector(
             simpleHDAOutput: "+-o SimpleHDA  <class SimpleHDA>",
@@ -332,8 +361,8 @@ final class AudioDriverTests: XCTestCase {
 
     func testSimpleHDAIsRecognizedForAudioTabVisibility() {
         for driver in [
-            "AppleALC", "SimpleHDA", "HDAUniversal", "VoodooHDA", "USB", "HDMI",
-            "DisplayPort",
+            "AppleALC", "SimpleHDA", "HDAUniversal", "VoodooHDA", "USB",
+            "eqMac", "HDMI", "DisplayPort",
         ] {
             XCTAssertTrue(AppState.hackintoshAudioDrivers.contains(driver))
         }

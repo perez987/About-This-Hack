@@ -101,8 +101,8 @@ private struct FakeSidebarLayout: View {
                 .padding(.horizontal, 8)
                 .frame(width: 185)
                 .frame(maxHeight: .infinity)
-                .background(Color(NSColor.controlBackgroundColor))  // opaque window
-                //                .background(.ultraThinMaterial) // transparent window
+                .background(Color(NSColor.controlBackgroundColor)) // opaque window
+                //                .background(.ultraThinMaterial)  // transparent window
                 .transition(.move(edge: .leading))
                 //                Divider()
                 .transition(.opacity)
@@ -114,8 +114,8 @@ private struct FakeSidebarLayout: View {
                 .id(appState.selectedSection)
                 .transition(.opacity)
         }
-        .background(Color(NSColor.controlBackgroundColor))  // opaque window
-        //        .background(.ultraThinMaterial) // transparent window
+        //        .background(Color(NSColor.controlBackgroundColor)) // opaque window
+        //        .background(.ultraThinMaterial)  // transparent window
         .toolbar {
             ToolbarItem(placement: .navigation) {
                 Button {

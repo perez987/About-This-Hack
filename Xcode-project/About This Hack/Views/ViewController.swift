@@ -22,23 +22,35 @@ struct OverviewView: View {
                 .padding(.horizontal, 24)
                 .padding(.top, 20)
                 .padding(.bottom, 16)
-                .frame(maxWidth: .infinity, alignment: sidebarVisible ? .leading : .center)
+                .frame(
+                    maxWidth: .infinity,
+                    alignment: sidebarVisible ? .leading : .center
+                )
 
-//            Divider()
+            //            Divider()
 
             specsSection
                 .padding(.horizontal, 24)
                 .padding(.vertical, 14)
-                .frame(maxWidth: .infinity, alignment: sidebarVisible ? .leading : .center)
+                .frame(
+                    maxWidth: .infinity,
+                    alignment: sidebarVisible ? .leading : .center
+                )
 
-//            Divider()
+            //            Divider()
 
             footerSection
                 .padding(.horizontal, 24)
                 .padding(.vertical, 32)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .onReceive(NotificationCenter.default.publisher(for: .customLogoDidChange)) { _ in
+        .frame(
+            maxWidth: .infinity,
+            maxHeight: .infinity,
+            alignment: .topLeading
+        )
+        .onReceive(
+            NotificationCenter.default.publisher(for: .customLogoDidChange)
+        ) { _ in
             viewModel.reloadLogo()
         }
         .onReceive(appState.$overviewData) { snapshot in
@@ -85,33 +97,51 @@ struct OverviewView: View {
     private var specsSection: some View {
         VStack(alignment: .leading, spacing: 7) {
             SpecRow(
-                label: NSLocalizedString("spec.processor", comment: "Processor label"),
+                label: NSLocalizedString(
+                    "spec.processor",
+                    comment: "Processor label"
+                ),
                 value: viewModel.cpu,
                 tooltip: viewModel.cpuTooltip
             )
             SpecRow(
-                label: NSLocalizedString("spec.memory", comment: "Memory label"),
+                label: NSLocalizedString(
+                    "spec.memory",
+                    comment: "Memory label"
+                ),
                 value: viewModel.ram,
                 tooltip: viewModel.ramTooltip
             )
             SpecRow(
-                label: NSLocalizedString("spec.graphics", comment: "Graphics label"),
+                label: NSLocalizedString(
+                    "spec.graphics",
+                    comment: "Graphics label"
+                ),
                 value: viewModel.graphics,
                 tooltip: viewModel.graphicsTooltip
             )
             SpecRow(
-                label: NSLocalizedString("spec.display", comment: "Display label"),
+                label: NSLocalizedString(
+                    "spec.display",
+                    comment: "Display label"
+                ),
                 value: viewModel.display,
                 tooltip: viewModel.displayTooltip
             )
             SpecRow(
-                label: NSLocalizedString("spec.startup_disk", comment: "Startup Disk label"),
+                label: NSLocalizedString(
+                    "spec.startup_disk",
+                    comment: "Startup Disk label"
+                ),
                 value: viewModel.startupDisk,
                 tooltip: viewModel.startupDiskTooltip
             )
             SerialRow(viewModel: viewModel)
             SpecRow(
-                label: NSLocalizedString("spec.bootloader", comment: "Bootloader label"),
+                label: NSLocalizedString(
+                    "spec.bootloader",
+                    comment: "Bootloader label"
+                ),
                 value: viewModel.bootloader,
                 tooltip: viewModel.bootloaderTooltip
             )
@@ -123,12 +153,22 @@ struct OverviewView: View {
     private var footerSection: some View {
         HStack(spacing: 10) {
             VStack(spacing: 8) {
-                Button(NSLocalizedString("button.system_report", comment: "System Report button")) {
+                Button(
+                    NSLocalizedString(
+                        "button.system_report",
+                        comment: "System Report button"
+                    )
+                ) {
                     viewModel.showSystemReport()
                 }
                 .buttonStyle(.bordered)
                 .help(viewModel.systemReportButtonTooltip)
-                Button(NSLocalizedString("button.software_update", comment: "Software Update button")) {
+                Button(
+                    NSLocalizedString(
+                        "button.software_update",
+                        comment: "Software Update button"
+                    )
+                ) {
                     viewModel.showSoftwareUpdate()
                 }
                 .buttonStyle(.bordered)
@@ -174,11 +214,16 @@ private struct SerialRow: View {
 
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 0) {
-            Text(NSLocalizedString("spec.serial_number", comment: "Serial Number label"))
-                .font(.system(size: 13))
-                .foregroundColor(.secondary)
-                .frame(width: labelWidth, alignment: .trailing)
-                .padding(.trailing, 8)
+            Text(
+                NSLocalizedString(
+                    "spec.serial_number",
+                    comment: "Serial Number label"
+                )
+            )
+            .font(.system(size: 13))
+            .foregroundColor(.secondary)
+            .frame(width: labelWidth, alignment: .trailing)
+            .padding(.trailing, 8)
 
             if viewModel.isSerialHidden {
                 Text(String(repeating: "•", count: 11))
@@ -190,9 +235,11 @@ private struct SerialRow: View {
             }
 
             Button(action: { viewModel.isSerialHidden.toggle() }) {
-                Image(systemName: viewModel.isSerialHidden ? "eye.slash" : "eye")
-                    .font(.system(size: 11))
-                    .foregroundColor(.secondary)
+                Image(
+                    systemName: viewModel.isSerialHidden ? "eye.slash" : "eye"
+                )
+                .font(.system(size: 11))
+                .foregroundColor(.secondary)
             }
             .buttonStyle(.plain)
             .padding(.leading, 6)
@@ -231,7 +278,8 @@ struct OverviewSnapshot {
     static func screenSummary() -> String {
         guard let screen = NSScreen.screens.first else { return "⎯" }
         // Use logical dimensions, matching the existing "UI Looks like" preference.
-        return "\(screen.localizedName) (\(Int(screen.frame.width)) x \(Int(screen.frame.height)))"
+        return
+            "\(screen.localizedName) (\(Int(screen.frame.width)) x \(Int(screen.frame.height)))"
     }
 
     static func initial(displaySummary: String) -> OverviewSnapshot {
@@ -239,23 +287,32 @@ struct OverviewSnapshot {
         HCMacModel.shared.getMacModel()
 
         var snapshot = OverviewSnapshot()
-        snapshot.osFullName = "\(HCVersion.shared.osPrefix) \(HCVersion.shared.osName)"
-        snapshot.systemVersion = "\(HCVersion.shared.osNumber) (\(HCVersion.shared.osBuildNumber))"
+        snapshot.osFullName =
+            "\(HCVersion.shared.osPrefix) \(HCVersion.shared.osName)"
+        snapshot.systemVersion =
+            "\(HCVersion.shared.osNumber) (\(HCVersion.shared.osBuildNumber))"
         let name = HCMacModel.shared.macName
         let fullModel = "\(name) - \(HCMacModel.shared.getModelIdentifier())"
         snapshot.macModel = fullModel.count > 60 ? name : fullModel
         snapshot.cpu = HCCPU.shared.getCPU()
         // Memory needs only the fast SPMemoryDataType report (created before this call).
         // Graphics and Display come from native APIs, as upstream. These are the final
-        // values, so the rows never change after first appearance.
+        // values, so the rows never change after first appearance. Absent or unnamed
+        // Metal GPUs wait for the detailed snapshot before the Overview is shown.
         snapshot.ram = HCRAM.shared.getRam()
         snapshot.graphics = HCGPU.shared.getNativeGPU() ?? "⎯"
         snapshot.display = displaySummary
-        let volume = try? URL(fileURLWithPath: "/").resourceValues(forKeys: [.volumeNameKey])
+        let volume = try? URL(fileURLWithPath: "/").resourceValues(forKeys: [
+            .volumeNameKey
+        ])
         snapshot.startupDisk = volume?.volumeName?.nilIfEmpty ?? "⎯"
-        let platform = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("IOPlatformExpertDevice"))
+        let platform = IOServiceGetMatchingService(
+            kIOMainPortDefault,
+            IOServiceMatching("IOPlatformExpertDevice")
+        )
         defer { if platform != 0 { IOObjectRelease(platform) } }
-        snapshot.serialNumber = HCSerialNumber.shared.getSerialNumber().nilIfEmpty
+        snapshot.serialNumber =
+            HCSerialNumber.shared.getSerialNumber().nilIfEmpty
             ?? registryString(platform, kIOPlatformSerialNumberKey) ?? ""
         // The SPHardwareDataType report (needed for Clover) exists before this call.
         snapshot.bootloader = HCBootloader.shared.getBootloader()
@@ -267,11 +324,14 @@ struct OverviewSnapshot {
     static func detailed(from initial: OverviewSnapshot) -> OverviewSnapshot {
         var snapshot = initial
         // Memory, Graphics and Display keep their first-paint values. system_profiler
-        // is only used for GPUs that Metal does not expose.
+        // is only used for GPUs absent from Metal or with blank/Unknown Metal names.
         if HCGPU.shared.getNativeGPU() == nil {
-            snapshot.graphics = HCGPU.shared.getGPU().nilIfEmpty ?? initial.graphics
+            snapshot.graphics =
+                HCGPU.shared.getGPU().nilIfEmpty ?? initial.graphics
         }
-        snapshot.startupDisk = HCStartupDisk.shared.getStartupDisk().nilIfEmpty ?? initial.startupDisk
+        snapshot.startupDisk =
+            HCStartupDisk.shared.getStartupDisk().nilIfEmpty
+            ?? initial.startupDisk
 
         let t = Tooltips.shared
         snapshot.osVersionTooltip = t.osVersiontoolTip
@@ -384,22 +444,30 @@ class OverviewViewModel: ObservableObject {
     }
 
     func reloadLogo() {
-        if let path = defaults.string(forKey: CustomLogoConstants.customLogoPathKey),
-           let image = NSImage(contentsOfFile: path)
+        if let path = defaults.string(
+            forKey: CustomLogoConstants.customLogoPathKey
+        ),
+            let image = NSImage(contentsOfFile: path)
         {
             logoImage = image
         } else {
-            logoImage = NSImage(named: HCVersion.shared.getOSImageName()) ?? NSImage()
+            logoImage =
+                NSImage(named: HCVersion.shared.getOSImageName()) ?? NSImage()
         }
     }
 
     func showSystemReport() {
-        NSWorkspace.shared.open(URL(fileURLWithPath: InitGlobVar.systemReportSP))
+        NSWorkspace.shared.open(
+            URL(fileURLWithPath: InitGlobVar.systemReportSP)
+        )
     }
 
     func showSoftwareUpdate() {
-        let majorVersion = ProcessInfo.processInfo.operatingSystemVersion.majorVersion
-        if majorVersion >= 13, let url = URL(string: InitGlobVar.softwareUpdateURL) {
+        let majorVersion = ProcessInfo.processInfo.operatingSystemVersion
+            .majorVersion
+        if majorVersion >= 13,
+            let url = URL(string: InitGlobVar.softwareUpdateURL)
+        {
             NSWorkspace.shared.open(url)
         }
     }

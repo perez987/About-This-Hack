@@ -26,9 +26,7 @@ class CreateDataFiles {
     private static let dataFilesState = DataFilesCreatedState()
 
     /// Notification name for when data files are created
-    static let dataFilesCreatedNotification = Notification.Name(
-        "DataFilesCreated"
-    )
+    static let dataFilesCreatedNotification = Notification.Name("DataFilesCreated")
 
     static var dataFilesCreated: Bool {
         dataFilesState.get()
@@ -36,9 +34,7 @@ class CreateDataFiles {
 
     /// Asynchronously creates initial data files
     /// - Parameter completion: Called on completion (main thread)
-    static func getInitDataFilesAsync(
-        completion: @Sendable @escaping () -> Void
-    ) {
+    static func getInitDataFilesAsync(completion: @Sendable @escaping () -> Void) {
         if dataFilesState.get() {
             DispatchQueue.main.async {
                 completion()
@@ -51,10 +47,7 @@ class CreateDataFiles {
             DispatchQueue.main.async {
                 completion()
                 // Post notification that data files are ready
-                NotificationCenter.default.post(
-                    name: dataFilesCreatedNotification,
-                    object: nil
-                )
+                NotificationCenter.default.post(name: dataFilesCreatedNotification, object: nil)
             }
         }
     }
@@ -70,62 +63,38 @@ class CreateDataFiles {
         directoryPrepared = true
 
         let fm = FileManager.default
-        let athURL = URL(
-            fileURLWithPath: InitGlobVar.athDirectory,
-            isDirectory: true
-        )
+        let athURL = URL(fileURLWithPath: InitGlobVar.athDirectory, isDirectory: true)
         try? fm.removeItem(at: athURL)
         do {
-            try fm.createDirectory(
-                at: athURL,
-                withIntermediateDirectories: true
-            )
+            try fm.createDirectory(at: athURL, withIntermediateDirectories: true)
         } catch {
             print("Could not create temp directory \(athURL.path): \(error)")
         }
-        //        print("Temp directory is \(athURL.path)")
+//        print("Temp directory is \(athURL.path)")
     }
 
     /// Fast reports the Overview needs beyond native APIs (memory type/speed and
     /// Clover detection). Creating them first lets the Overview appear with final values.
     private static let overviewCommands: [(path: String, command: String)] = [
-        (
-            InitGlobVar.sysmemFilePath,
-            "system_profiler SPMemoryDataType 2>/dev/null | grep -v \"^Memory:$\" > \"\(InitGlobVar.sysmemFilePath)\""
-        ),
-        (
-            InitGlobVar.hwFilePath,
-            "system_profiler SPHardwareDataType 2>/dev/null > \"\(InitGlobVar.hwFilePath)\""
-        ),
+        (InitGlobVar.sysmemFilePath, "system_profiler SPMemoryDataType 2>/dev/null | grep -v \"^Memory:$\" > \"\(InitGlobVar.sysmemFilePath)\""),
+        (InitGlobVar.hwFilePath, "system_profiler SPHardwareDataType 2>/dev/null > \"\(InitGlobVar.hwFilePath)\""),
     ]
 
     /// Note: scrXmlFilePath and syssoftdataFilePath removed - they were never used in the codebase
     /// Note: SPDisplaysDataType is run directly (without a file) in HardwareCollector.getAllData()
     private static let detailCommands: [(path: String, command: String)] = [
-        (
-            InitGlobVar.bootvolnameFilePath,
-            "diskutil info / 2>/dev/null > \"\(InitGlobVar.bootvolnameFilePath)\""
-        ),
-        (
-            InitGlobVar.bootvollistFilePath,
-            "diskutil list / 2>/dev/null > \"\(InitGlobVar.bootvollistFilePath)\""
-        ),
-        (
-            InitGlobVar.storagedataFilePath,
-            "system_profiler SPStorageDataType 2>/dev/null > \"\(InitGlobVar.storagedataFilePath)\""
-        ),
+        (InitGlobVar.bootvolnameFilePath, "diskutil info / 2>/dev/null > \"\(InitGlobVar.bootvolnameFilePath)\""),
+        (InitGlobVar.bootvollistFilePath, "diskutil list / 2>/dev/null > \"\(InitGlobVar.bootvollistFilePath)\""),
+        (InitGlobVar.storagedataFilePath, "system_profiler SPStorageDataType 2>/dev/null > \"\(InitGlobVar.storagedataFilePath)\""),
     ]
 
     private static func fileHasContent(_ path: String) -> Bool {
-        let size =
-            (try? FileManager.default.attributesOfItem(atPath: path)[.size]
-            as? NSNumber)?.intValue ?? 0
+        let size = (try? FileManager.default.attributesOfItem(atPath: path)[.size] as? NSNumber)?.intValue ?? 0
         return size > 0
     }
 
     /// Runs the commands whose output files do not exist yet, concurrently, and waits for them.
-    private static func runMissing(_ entries: [(path: String, command: String)])
-    {
+    private static func runMissing(_ entries: [(path: String, command: String)]) {
         prepareDirectory()
         let group = DispatchGroup()
         let queue = DispatchQueue.global(qos: .userInitiated)

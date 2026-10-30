@@ -98,24 +98,15 @@
 "Language changed alert title" = "Sprache geändert";
 "Language changed message" = "Bitte starte die Anwendung neu,\num die neue Sprache anzuwenden.";
 
+/* Main menu - App menu */
 "menu.app.title" = "About This Hack";
 "menu.app.about" = "About This Hack";
-"menu.app.preferences" = "Preferences";
-"menu.app.services" = "Services";
-"menu.app.hide" = "Hide About This Hack-glass";
-"menu.app.hide_others" = "Hide Others";
-"menu.app.show_all" = "Show All";
-"menu.app.quit" = "Quit About This Hack-glass";
-
-/* Main menu - App menu */
-"menu.app.title" = "About This Hack-glass";
-"menu.app.about" = "About This Hack-glass";
 "menu.app.preferences" = "Einstellungen";
 "menu.app.services" = "Dienste";
-"menu.app.hide" = "About This Hack-glass ausblenden";
+"menu.app.hide" = "About This Hack ausblenden";
 "menu.app.hide_others" = "Andere ausblenden";
 "menu.app.show_all" = "Alle einblenden";
-"menu.app.quit" = "About This Hack-glass beenden";
+"menu.app.quit" = "About This Hack beenden";
 
 /* Main menu - Window menu */
 "menu.window.title" = "Fenster";
@@ -131,7 +122,7 @@
 
 /* Main menu - Help menu */
 "menu.help.title" = "Hilfe";
-"menu.help.ath_help" = "About This Hack-glass Hilfe";
+"menu.help.ath_help" = "About This Hack Hilfe";
 
 /* Sparkle updater */
 "Check for Updates..." = "Nach Updates suchen...";

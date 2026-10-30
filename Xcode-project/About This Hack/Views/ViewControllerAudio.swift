@@ -69,7 +69,9 @@ struct AudioView: View {
             }
             if !viewModel.deviceName.isEmpty {
                 AudioSpecRow(
-                    label: NSLocalizedString("audio.spec.device_id", comment: "Device ID label"),
+                    label: viewModel.driver == "eqMac"
+                        ? NSLocalizedString("audio.spec.product", comment: "Product label")
+                        : NSLocalizedString("audio.spec.device_id", comment: "Device ID label"),
                     value: viewModel.deviceName,
                     tooltip: viewModel.deviceTooltip
                 )

@@ -315,6 +315,20 @@ final class HCAudio: @unchecked Sendable {
             let manufacturer = (props["Manufacturer"] ?? "").trimmingCharacters(
                 in: .whitespaces
             )
+            let outputSource = (props["Output Source"] ?? "")
+                .trimmingCharacters(
+                    in: .whitespaces
+                )
+            let outputName = outputSource.isEmpty ? currentName : outputSource
+            if currentName.localizedCaseInsensitiveContains("eqmac")
+                || outputName.localizedCaseInsensitiveContains("eqmac")
+                || manufacturer.localizedCaseInsensitiveContains("bitgapp")
+            {
+                return computeEqMacAudioInfo(
+                    deviceName: outputName,
+                    manufacturer: manufacturer
+                )
+            }
             return AudioInfo(
                 codecName: currentName,
                 vendorName: manufacturer,
@@ -353,6 +367,42 @@ final class HCAudio: @unchecked Sendable {
 
         // Evaluate the last device block.
         return evaluateDevice()
+    }
+
+    private func computeEqMacAudioInfo(deviceName: String, manufacturer: String)
+        -> AudioInfo
+    {
+        let codecOutput = runCommand(
+            "ioreg -l -r -c IOHDACodecDevice -w 0 2>/dev/null"
+        )
+        let codecId = parseVendorId(from: codecOutput)
+        let (codecName, codecHex) =
+            codecId > 0 ? lookupCodecName(vendorId: codecId) : ("", "")
+
+        var layoutId = parseLayoutId(from: codecOutput)
+        if layoutId.isEmpty {
+            let nodeNames = ["HDEF", "HDAS", "ALZA", "AZAL"]
+            for name in nodeNames {
+                let controllerOutput = runCommand(
+                    "ioreg -l -r -n \(name) -w 0 2>/dev/null"
+                )
+                if !controllerOutput.isEmpty {
+                    layoutId = parseLayoutId(from: controllerOutput)
+                    if !layoutId.isEmpty { break }
+                }
+            }
+        }
+
+        return AudioInfo(
+            codecName: codecName,
+            vendorName: manufacturer,
+            deviceName: deviceName,
+            layoutId: layoutId,
+            driver: "eqMac",
+            codecHex: codecHex,
+            vendorHex: "",
+            deviceHex: ""
+        )
     }
 
     // MARK: - HDMI Audio Detection
@@ -538,26 +588,27 @@ final class HCAudio: @unchecked Sendable {
         for line in output.components(separatedBy: .newlines) {
             let t = line.trimmingCharacters(in: .whitespaces)
             // Use contains instead of hasPrefix (see parseVendorId comment).
-            guard t.contains(searchKey) else { continue }
+            guard let keyRange = t.range(of: searchKey) else { continue }
+            let property = t[keyRange.upperBound...]
+            guard let eqRange = property.range(of: "=") else { continue }
+            let value = property[eqRange.upperBound...]
+                .trimmingCharacters(in: .whitespaces)
             // Try data format first: <XXYYZZ...>
-            if let open = t.firstIndex(of: "<"),
-                let close = t.firstIndex(of: ">"),
+            if let open = value.firstIndex(of: "<"),
+                let close = value.firstIndex(of: ">"),
                 close > open
             {
-                let hex = String(t[t.index(after: open)..<close])
+                let hex = String(value[value.index(after: open)..<close])
                 guard hex.count >= 2 else { continue }
                 let byteStr = String(hex.prefix(2))
                 if let byte = UInt32(byteStr, radix: 16), byte > 0 {
                     return "\(byte)"
                 }
             }
-            // Fall back to integer format: "layout-id" = 7
-            if let eqRange = t.range(of: "=") {
-                let valueStr = String(t[eqRange.upperBound...])
-                    .trimmingCharacters(in: .whitespaces)
-                if let value = UInt32(valueStr), value > 0 {
-                    return "\(value)"
-                }
+            // Fall back to integer format, including values nested in an ioreg dictionary.
+            let digits = value.prefix(while: { $0.isNumber })
+            if let id = UInt32(String(digits)), id > 0 {
+                return "\(id)"
             }
         }
         return nil

@@ -91,9 +91,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
         // Enable transparent liquid-glass style (Tahoe): the SwiftUI content
         // supplies material backgrounds (.regularMaterial / .ultraThinMaterial),
         // so the window itself is kept transparent and non-opaque.
-        //        window.isOpaque = false
-        //        window.backgroundColor = .clear
-        //        window.titlebarAppearsTransparent = true
+//        window.isOpaque = false
+//        window.backgroundColor = .clear
+//        window.titlebarAppearsTransparent = true
 
         // END: transparent window -----------------------------------------
 

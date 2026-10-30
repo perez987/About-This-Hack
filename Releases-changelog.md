@@ -1,5 +1,12 @@
 # Releases Changelog
 
+## 5.1.3 - Oct 30, 2026
+
+**Downgrade target to macOS 14+**
+
+- Minimum target is now macOS Sonoma 14.6+
+- Add support for audio by eq-Mac (Bitgapp Ltd)
+
 ## 5.1.2 - Oct 20, 2026
 
 **Fix SimpleHDA**

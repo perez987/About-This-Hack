@@ -57,7 +57,7 @@ enum AppSection: String, CaseIterable, Identifiable {
 /// Shared observable state used by both AppDelegate (menu actions) and ContentView (navigation).
 class AppState: ObservableObject {
     nonisolated(unsafe) static let shared = AppState()
-    static let hackintoshAudioDrivers: Set<String> = ["AppleALC", "SimpleHDA", "HDAUniversal", "VoodooHDA", "USB", "HDMI", "DisplayPort"]
+    static let hackintoshAudioDrivers: Set<String> = ["AppleALC", "SimpleHDA", "HDAUniversal", "VoodooHDA", "USB", "eqMac", "HDMI", "DisplayPort"]
 
     @Published var selectedSection: AppSection? = .overview {
         didSet {
@@ -119,7 +119,7 @@ class AppState: ObservableObject {
                 // OpenCore + OCLP can mean either a real Mac patched for newer macOS
                 // compatibility, or a Hackintosh that uses OCLP for driver patches
                 // (e.g. audio, WiFi on Sonoma).  Treat as Hackintosh when
-                // AppleALC, SimpleHDA, HDAUniversal, VoodooHDA, USB, HDMI, or DisplayPort audio is detected as the default output.
+                // AppleALC, SimpleHDA, HDAUniversal, VoodooHDA, USB, eqMac, HDMI, or DisplayPort audio is detected as the default output.
                 return AppState.hackintoshAudioDrivers.contains(driver)
             }
             return true
@@ -127,7 +127,7 @@ class AppState: ObservableObject {
 
         // Fallback for OpenCore systems where bootloader string lookup failed:
         // Known Hackintosh audio drivers (AppleALC / SimpleHDA / HDAUniversal / VoodooHDA /
-        // USB / HDMI / DisplayPort) indicate this is not a stock Apple boot path.
+        // USB / eqMac / HDMI / DisplayPort) indicate this is not a stock Apple boot path.
         let driver = HCAudio.shared.getAudioInfo().driver
         if AppState.hackintoshAudioDrivers.contains(driver) {
             return true
@@ -142,7 +142,7 @@ class AppState: ObservableObject {
 
     /// True when the audio tab should be visible.
     /// Shown on Hackintoshes running AppleALC, SimpleHDA, HDAUniversal, VoodooHDA (with getdump available),
-    /// or with a USB, HDMI, or DisplayPort audio device set as the default output.
+    /// or with a USB, eqMac, HDMI, or DisplayPort audio device set as the default output.
     /// Hidden on real Macs and on Hackintoshes where none of these are active
     /// (or when VoodooHDA is active but getdump is not installed).
     /// Provisionally shown for OpenCore/Clover using the Overview snapshot while
