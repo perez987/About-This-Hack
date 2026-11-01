@@ -688,7 +688,7 @@ final class HCAudio: @unchecked Sendable {
             // Realtek: model number encoded as hex digits matching the "ALC" designation
             // e.g. 0x0887 → ALC887, 0x1220 → ALC1220
             // 0x10EC1168 is the ALCS1220 codec (ALC1168 is not used in Macs/Hackintoshes)
-            if model == 0x1168 { return ("Realtek ALCS1220", hex) }
+            if model == 0x1168 { return ("Realtek ALC S1220A", hex) }
             return ("Realtek ALC\(String(format: "%X", model))", hex)
         case 0x8086:
             return ("Intel \(String(format: "0x%04X", model))", hex)
