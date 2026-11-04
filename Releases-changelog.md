@@ -1,5 +1,11 @@
 # Releases Changelog
 
+## 5.1.4 - Nov 1, 2026
+
+**Add ALC S1220A support**
+
+- Add ALC S1220A audio codec detection
+
 ## 5.1.3 - Oct 30, 2026
 
 **Downgrade target to macOS 13+**
