@@ -131,7 +131,7 @@ The custom logo image is saved in the path `~/Library/Application Support/com.0x
 
 ## Compatibility
 
-- Supports macOS 14.6 Sonoma and newer
+- Supports macOS 13.5 Ventura and newer
 - Not compatible with Linux or Windows.
 
 ## Building from Source
