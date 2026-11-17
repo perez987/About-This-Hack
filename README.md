@@ -116,11 +116,7 @@ The custom logo image is saved in the path `~/Library/Application Support/com.0x
 ## Languages
 
 - Language system: English (`en`), Spanish (`es`), German (`de`), French (`fr`), Italian (`it`), Russian (`ru`)
-- Language selector.
-
-| |
-| --- |
-| ![Overview](Images/Languages.png) | 
+- Language selector. 
 
 ## Getting Started
 
