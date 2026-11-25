@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+    <channel>
+    <title>About This Hack beta</title> 
+       <item>
+            <title>Version 5.1.5 beta</title>
+            <description xml:lang="en"><![CDATA[
+         	<h3>About This Hack-glass 5.1.5 beta version</h3>
+			<ul>
+				<li>Show the connection type in the Displays cards (WIP)</li>
+			</ul> 
+			]]></description>
+            <sparkle:version>1665</sparkle:version>
+            <sparkle:shortVersionString>5.1.5</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>13</sparkle:minimumSystemVersion>
+            <pubDate>Sat, 28 Mar 2026 21:24:31 +0000</pubDate>
+            <enclosure
+                url="https://github.com/perez987/About-This-Hack/releases/download/5.1.5/About.This.Hack-glass.5.1.5.dmg"
+                length="7854456"
+                sparkle:edSignature="AhAtmi+paGNSJmhLtZGKboUvQe6nicqRgPoPEf7omTJhk079aWJb7GoFHURdFzlwll0uobRkCweGmDA3Plq2Cg=="
+                type="application/octet-stream"
+            />
+        </item>
+        
+    </channel>
+</rss>
