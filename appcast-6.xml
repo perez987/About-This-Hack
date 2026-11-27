@@ -6,7 +6,7 @@
             <description xml:lang="en"><![CDATA[
 				<h3>What's New in About This Hack 5.1.6</h3>
 				<ul>
-					<li>Add scripts to automate the release and DMG creation and upload to GitHub</li>
+					<li>Add scripts to automate the creation and publishing of DMG files, as well as their upload to GitHub.</li>
 					<li>There are no changes to the app code.</li>
 				</ul>
 			]]></description>
