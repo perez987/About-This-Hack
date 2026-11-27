@@ -28,12 +28,13 @@ Some will like it, some won't, and many others would have done it differently (p
 - Add language menu and language selector window (en, es, de, fr, it, ru)
 - Rework the Displays UI to enable full display counts (removed hard limit of 3); use a horizontal ScrollView if more of 3 displays are found
 - Center window content when sidebar is hidden
-- Update displays detection: remove `scr.txt` intermediary file for `SPDisplaysDataType`, `system_profiler SPDisplaysDataType` is written to `scr.txt` and then read back into the cache, the file round-trip is unnecessary
+- Update displays detection
 - Replace the custom updater system by Sparkle
 - Main version has opaque windows, but there is a version with translucent windows (`About This Hack-glass`)
 - Add audio tab with audio information (work in progress)
-- App is certified by Apple.
-- Fast first data display, adapted from upstream [commit 064d609](https://github.com/2009-Nissan-Cube/About-This-Hack/commit/064d609c770aca619aad05ddc0ba05813ef1945a).
+- App is certified by Apple
+- Fast first data display
+- Scripts to automate the release creation and the DMG upload to GitHub with app cast.xml update.
 
 You can read about the migration process in [AppKit-XIB to SwiftUI](DOCS/AppKit-XIB-to-SwiftUI.md).
 
