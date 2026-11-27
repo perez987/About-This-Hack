@@ -40,8 +40,10 @@ About-This-Hack/
 │   └── appcast-backup.xml
 ├── Images/                            ← README screenshots (not bundled)
 ├── Releases-changelog.md
-├── appcast.xml
-├── appcast-glass.xml
+├── appcast-6.xml                      ← Sparkle feed read by SUFeedURL (updated by Scripts/publish.sh)
+├── appcast.xml, appcast-6glass*.xml   ← other/older feeds, not touched by the scripts
+├── Scripts/                           ← release.sh and publish.sh (see Releasing)
+├── Xcode-project/Backgrounds/         ← DMG window background (background.png, background@2x.png)
 └── About This Hack/                   ← All source code
     ├── AppDelegate.swift              ← App entry point, window/menu setup
     ├── HardwareCollector.swift        ← Central data collector (singleton)
@@ -220,6 +222,18 @@ Assets are in `Assets.xcassets`. Notable image sets:
   xcodebuild test -project "About This Hack.xcodeproj" -scheme "About This Hack" -destination platform=macOS
   ```
 - The app is storyboard-free: `NSPrincipalClass` points to `AppDelegate`, and `AppDelegate.main()` is the entry point (marked `@main`).
+
+## Releasing
+
+1. Raise `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` (plain build number, e.g. `1665`) in the project.
+2. `./Scripts/release.sh` archives, signs with Developer ID, notarizes, and builds `Distribute/About.This.Hack.<version>.dmg` (signed, notarized, stapled) with appdmg (default) or `DMG_TOOL=node` (npm create-dmg). `Distribute/` is git-ignored.
+3. `RELEASE_NOTES=$'First change\nSecond change' ./Scripts/publish.sh` creates the GitHub Release, signs the DMG for Sparkle, adds a "What's New in About This Hack <version>" list to `appcast-6.xml`, and commits and pushes it to `main`.
+
+Conventions the scripts follow, keep them if you change the scripts:
+
+- Tags and GitHub Release titles are the plain version (`5.1.5`), without a `v` prefix.
+- `appcast-6.xml` is the feed in `SUFeedURL`; it has a single `<item>` pointing at `About.This.Hack.<version>.dmg`, whose description keeps the "What's New" history, newest first. Don't edit the enclosure or version fields by hand; `publish.sh` rewrites them.
+- An `About.This.Hack-glass.<version>.dmg` placed in `Distribute/` is uploaded to the same release, but isn't put in any feed.
 
 ## Agent Quickstart (for new tasks)
 

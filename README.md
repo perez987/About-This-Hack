@@ -140,6 +140,31 @@ xcodebuild test -project "About This Hack.xcodeproj" -scheme "About This Hack" -
 
 The tests cover processor and bootloader formatting, GPU name fallback and per-adapter PCI matching, SimpleHDA driver precedence and audio tab recognition, version comparison, matching localization keys across languages, and a quick check that each hardware collector returns a value on the current Mac.
 
+## Releasing
+
+Two scripts in `Scripts/` automate a release (macOS only; run them opening Terminal in the Scripts folder → `./script.sh` or `sh script.sh`):
+
+- **`release.sh`** archives a Release build, signs it with Developer ID, notarizes and staples the app, then builds `Distribute/About.This.Hack.<version>.dmg` and signs, notarizes and staples the DMG too.
+- **`publish.sh`** uploads that DMG to a GitHub Release (tag and title `<version>`, as in earlier releases), signs it for Sparkle and updates `appcast-6.xml` (the feed in `SUFeedURL`) on `main`. If `Distribute/About.This.Hack-glass.<version>.dmg` is also there, it is uploaded to the same release.
+
+What they need, all kept out of the repository:
+
+- A *Developer ID Application* certificate in the login keychain.
+- Notarization credentials saved once with `xcrun notarytool store-credentials "notary-profile" --apple-id <Apple ID> --team-id <team>` (the app-specific password is typed at the prompt, never stored in a file).
+- `appdmg` or `create-dmg` from npm (`npm install -g create-dmg` brings both).
+- The Sparkle EdDSA private key in the keychain, and `gh` signed in (`gh auth login`).
+
+Steps:
+
+1. Raise `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` in the project (Sparkle compares the build number, e.g. `5.1.5` → `1665`).
+2. `./Scripts/release.sh`
+3. `RELEASE_NOTES=$'First change\nSecond change' ./Scripts/publish.sh`
+
+Options for `release.sh`:
+
+- `DMG_TOOL=appdmg` (default) uses the window background in `Xcode-project/Backgrounds/`; `DMG_TOOL=node` uses the standard design of `create-dmg`.
+- `DMG_ONLY=1` reuses the app notarized in the last full run and only rebuilds the DMG, which is handy for trying DMG layouts.
+
 ## Credits
 
 A big thank you to our contributors:
