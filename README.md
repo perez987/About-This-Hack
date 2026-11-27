@@ -25,7 +25,7 @@ Some will like it, some won't, and many others would have done it differently (p
 - App bundle size has been reduced from 29 to 10 MB
 - Replace ATHLogger with print statements (error/warning prints where failures are meaningful for debugging)
 - Replace macOS version icons with liquid glass badges
-- Add language menu and language selector window (en, es, de, fr, it)
+- Add language menu and language selector window (en, es, de, fr, it, ru)
 - Rework the Displays UI to enable full display counts (removed hard limit of 3); use a horizontal ScrollView if more of 3 displays are found
 - Center window content when sidebar is hidden
 - Update displays detection: remove `scr.txt` intermediary file for `SPDisplaysDataType`, `system_profiler SPDisplaysDataType` is written to `scr.txt` and then read back into the cache, the file round-trip is unnecessary

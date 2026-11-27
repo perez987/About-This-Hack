@@ -4,19 +4,19 @@
 
 **About This Hack** is a macOS app that recreates the classic pre-Ventura "About This Mac" window with modern enhancements. It targets both Hackintosh users (PCs running macOS via OpenCore or Clover bootloaders) and real Mac users. It displays hardware info (CPU, RAM, GPU, displays, storage, audio codec), bootloader version, serial number, and support links.
 
-- macOS 13 (Ventura) minimum deployment target
+- macOS 13.5 (Ventura) minimum deployment target
 - Swift 6 + SwiftUI UI (migrated from AppKit/XIB)
 - Storyboard-free (AppDelegate bootstraps everything manually)
 - Auto-updater via Sparkle framework (SPM dependency)
 - Localized into: English (`en`), Spanish (`es`), German (`de`), French (`fr`), Italian (`it`), Russian (`ru`)
-- Transparent/liquid-glass window style (`.ultraThinMaterial` / `.regularMaterial` backgrounds)
+- Opaque windows on `main`; a translucent/liquid-glass variant (`About This Hack-glass`) is built by uncommenting the transparent-window code (see Common Pitfalls)
 
 ## Tech Stack
 
 | Area | Technology |
 |---|---|
 | Language | Swift 6 |
-| UI framework | SwiftUI (macOS 13+) |
+| UI framework | SwiftUI (macOS 13.5+) |
 | App lifecycle | AppKit (`NSApplicationDelegate`, no storyboard) |
 | Auto-updater | Sparkle via SPM package (`UpdaterController` wrapping `SPUStandardUpdaterController`) |
 | Shell execution | Custom `run(_ command: String) -> String` via `/bin/zsh` subprocess |
@@ -36,57 +36,60 @@ About-This-Hack/
 │   ├── App-damaged.md
 │   ├── Console-warning.md
 │   ├── Replace-custom-logo.md
-│   ├── Transparent-windows.md
-│   └── appcast-backup.xml
+│   └── Reshow-dialog-first-launch.md
 ├── Images/                            ← README screenshots (not bundled)
 ├── Releases-changelog.md
 ├── appcast-6.xml                      ← Sparkle feed read by SUFeedURL (updated by Scripts/publish.sh)
 ├── appcast.xml, appcast-6glass*.xml   ← other/older feeds, not touched by the scripts
 ├── Scripts/                           ← release.sh and publish.sh (see Releasing)
-├── Xcode-project/Backgrounds/         ← DMG window background (background.png, background@2x.png)
-└── About This Hack/                   ← All source code
-    ├── AppDelegate.swift              ← App entry point, window/menu setup
-    ├── HardwareCollector.swift        ← Central data collector (singleton)
-    ├── About_This_Hack.entitlements
-    ├── Info.plist
-    ├── Assets.xcassets/               ← Images (OS badges, disk icons, display icons)
-    ├── HardwareCollectors/            ← Individual hardware data collectors
-    │   ├── HCAudio.swift
-    │   ├── HCBootloader.swift
-    │   ├── HCCPU.swift
-    │   ├── HCDisplay.swift
-    │   ├── HCGPU.swift
-    │   ├── HCMacModel.swift
-    │   ├── HCRAM.swift
-    │   ├── HCSerialNumber.swift
-    │   ├── HCStartupDisk.swift
-    │   └── HCVersion.swift
-    ├── Models/                        ← Shared state, data init, utilities
-    │   ├── CreateDataFiles.swift      ← Async creation of temp data files
-    │   ├── InitGlobalVariables.swift  ← All global constants and paths
-    │   ├── LoadingIndicatorController.swift
-    │   ├── SystemFunctions.swift      ← getSysctlValueByKey(), IOKit port helpers, Bundle ext.
-    │   ├── Tooltips.swift             ← Lazy tooltip strings (expensive to compute)
-    │   ├── UpdateController.swift     ← Sparkle updater controller wrapper
-    ├── Utilities/                     ← Small helpers
-    │   ├── CustomLogoConstants.swift  ← UserDefaults key + Notification.Name
-    │   ├── InsertExtension.swift      ← String/Data extensions
-    │   ├── Reachability.swift         ← Network reachability helper
-    │   └── Shell.swift                ← run() function definition
-    ├── Views/                         ← All SwiftUI views + AppState
-    │   ├── ContentView.swift          ← Root view: LoadingView or FakeSidebarLayout
-    │   ├── ViewController.swift       ← OverviewView + OverviewViewModel
-    │   ├── ViewControllerDisplays.swift ← DisplaysView + DisplaysViewModel
-    │   ├── ViewControllerStorage.swift  ← StorageView + StorageViewModel
-    │   ├── ViewControllerAudio.swift    ← AudioView + AudioViewModel
-    │   ├── ViewControllerSupport.swift  ← SupportView
-    │   ├── SettingsView.swift           ← Settings window (custom logo)
-    │   ├── SettingsWindowController.swift
-    │   ├── LanguageSelectorView.swift
-    │   ├── LanguageSelectorWindowController.swift
-    │   └── WindowController.swift       ← AppState: ObservableObject shared state
-    └── {en,es,fr,it,de,ru}.lproj/
-        └── Localizable.strings
+├── Distribute/                        ← DMGs built by release.sh (git-ignored)
+└── Xcode-project/
+    ├── About This Hack.xcodeproj
+    ├── Backgrounds/                   ← DMG window background (background.png, background@2x.png)
+    ├── AboutThisHackTests/            ← XCTest target (AboutThisHackTests.swift)
+    └── About This Hack/               ← All source code
+        ├── AppDelegate.swift          ← App entry point, window/menu setup
+        ├── HardwareCollector.swift    ← Central data collector (singleton)
+        ├── About_This_Hack.entitlements
+        ├── Info.plist                 ← Includes SUFeedURL and SUPublicEDKey
+        ├── Assets.xcassets/           ← Images (OS badges, disk icons, display icons)
+        ├── HardwareCollectors/        ← Individual hardware data collectors
+        │   ├── HCAudio.swift
+        │   ├── HCBootloader.swift
+        │   ├── HCCPU.swift
+        │   ├── HCDisplay.swift
+        │   ├── HCGPU.swift
+        │   ├── HCMacModel.swift
+        │   ├── HCRAM.swift
+        │   ├── HCSerialNumber.swift
+        │   ├── HCStartupDisk.swift
+        │   └── HCVersion.swift
+        ├── Models/                    ← Shared state, data init, utilities
+        │   ├── CreateDataFiles.swift  ← Async creation of temp data files
+        │   ├── InitGlobalVariables.swift  ← All global constants and paths
+        │   ├── LoadingIndicatorController.swift
+        │   ├── SystemFunctions.swift  ← getSysctlValueByKey(), IOKit port helpers, Bundle ext.
+        │   ├── Tooltips.swift         ← Lazy tooltip strings (expensive to compute)
+        │   └── UpdateController.swift ← Sparkle updater controller wrapper
+        ├── Utilities/                 ← Small helpers
+        │   ├── CustomLogoConstants.swift  ← UserDefaults key + Notification.Name
+        │   ├── InsertExtension.swift  ← String/Data extensions
+        │   ├── Reachability.swift     ← Network reachability helper
+        │   └── Shell.swift            ← run() function definition
+        ├── Views/                     ← All SwiftUI views + AppState
+        │   ├── ContentView.swift      ← Root view: LoadingView or FakeSidebarLayout
+        │   ├── ViewController.swift   ← OverviewView + OverviewViewModel
+        │   ├── ViewControllerDisplays.swift ← DisplaysView + DisplaysViewModel
+        │   ├── ViewControllerStorage.swift  ← StorageView + StorageViewModel
+        │   ├── ViewControllerAudio.swift    ← AudioView + AudioViewModel
+        │   ├── ViewControllerSupport.swift  ← SupportView
+        │   ├── SettingsView.swift           ← Settings window (custom logo)
+        │   ├── SettingsWindowController.swift
+        │   ├── LanguageSelectorView.swift
+        │   ├── LanguageSelectorWindowController.swift
+        │   └── WindowController.swift       ← AppState: ObservableObject shared state
+        └── {en,es,fr,it,de,ru}.lproj/
+            └── Localizable.strings
 ```
 
 ## Architecture & Data Flow
@@ -203,15 +206,16 @@ Assets are in `Assets.xcassets`. Notable image sets:
 
 ## Sparkle Auto-Updater
 
-- `UpdaterController` wraps `SPUStandardUpdaterController` from the Sparkle SPM package (2.9.3).
+- `UpdaterController` wraps `SPUStandardUpdaterController` from the Sparkle SPM package (minimum 2.9.4; `Package.resolved` currently pins 2.10.1).
 - It publishes `canCheckForUpdates` so `AppDelegate.validateMenuItem` can enable/disable the menu item.
 - The "Check for Updates…" menu item (`⌘U`) calls `updaterController?.checkForUpdates()`.
+- `SUFeedURL` in `Info.plist` points to `appcast-6.xml` on `main` (raw.githubusercontent.com); `publish.sh` keeps it up to date.
 
 ## Building
 
 - Open `About This Hack.xcodeproj` in a current Xcode release with Swift 6 support.
 - Xcode resolves the Sparkle SPM package automatically on first open/build.
-- Target: macOS 13+, architecture: universal (Apple Silicon + Intel).
+- Target: macOS 13.5+, architecture: universal (Apple Silicon + Intel).
 - The `AboutThisHackTests` XCTest target includes:
   - Formatting checks for processor and bootloader output, plus system-version comparison.
   - Localization key parity checks across `en`, `de`, `es`, `fr`, `it`, and `ru`.
@@ -242,11 +246,14 @@ Use this checklist when starting a new session:
 1. Read `README.md` and this file to confirm current behavior and constraints.
 2. If touching UI/navigation: inspect `Views/ContentView.swift`, `Views/WindowController.swift`, and `AppDelegate.swift`.
 3. If touching hardware data: inspect `HardwareCollector.swift` plus relevant `HardwareCollectors/HC*.swift`.
-4. If adding user-visible text: update all `Localizable.strings` files in `en/es/fr/it/de`.
+4. If adding user-visible text: update all `Localizable.strings` files in `en/es/fr/it/de/ru`.
 5. If adding shell/system calls: keep them off the main thread and route through `run(_:)`.
 6. If changing updater behavior: verify `Models/UpdateController.swift` and Sparkle wiring in `AppDelegate`.
 
 ## Task-to-File Map (fast lookup)
+
+Paths are relative to `Xcode-project/`.
+
 
 - App lifecycle and menu/actions: `About This Hack/AppDelegate.swift`
 - Shared app state and tab routing: `About This Hack/Views/WindowController.swift`
@@ -271,7 +278,7 @@ Use this checklist when starting a new session:
 - **`Tooltips._macModeltoolTip`** runs `system_profiler SPPCIDataType` and must be pre-warmed on a background thread (done in `AppState.loadDataAsync()`).
 - **Sidebar toggle animation** uses `withAnimation(.easeInOut(duration: 0.25))`. The sidebar and divider use `.transition(.move(edge: .leading))` / `.transition(.opacity)`.
 - **`run()` does not call `waitUntilExit()`** by design (see `Shell.swift` comment). `readDataToEndOfFile()` already provides the necessary blocking; adding `waitUntilExit()` would spin the RunLoop. This is intentional and must not be reverted.
-- **Transparent window (current default)**: the main window, Settings window, and Language Selector window all use a transparent/liquid-glass setup (`NSWindow.isOpaque = false`, `backgroundColor = .clear`, transparent title bars, and material-backed SwiftUI content). The older opaque-window code paths are still present as comments in some files.
+- **Opaque vs. translucent windows**: on `main` the windows are opaque. The transparent/liquid-glass setup (`NSWindow.isOpaque = false`, `backgroundColor = .clear`, `titlebarAppearsTransparent = true`, plus some `.ultraThinMaterial` backgrounds) is kept commented out, marked `transparent window` / `TRANSPARENT WINDOW`, in `AppDelegate.swift`, `SettingsWindowController.swift`, `LanguageSelectorWindowController.swift`, `SettingsView.swift` and `ContentView.swift`. Uncommenting it gives the `About This Hack-glass` variant, distributed as `About.This.Hack-glass.<version>.dmg`.
 - **`AppSection.audio`** is filtered out of the sidebar list when `shouldShowAudioTab` is false.
 
 ## Where to Look for Things
@@ -282,7 +289,7 @@ Use this checklist when starting a new session:
 | Add a new tab | Add a case to `AppSection` in `WindowController.swift`, add a new view file in `Views/`, update `FakeSidebarLayout.detailView`, add menu item in `AppDelegate.createMainMenu()` |
 | Change the Language menu | `AppDelegate.insertLanguageMenu()` – inserts a "Language" submenu (⌘L) between the main app menu and the Window menu |
 | Change global paths or URLs | `Models/InitGlobalVariables.swift` |
-| Add/edit a Localized string | All five `{lang}.lproj/Localizable.strings` |
+| Add/edit a Localized string | All six `{lang}.lproj/Localizable.strings` |
 | Change update checker | `Models/UpdateController.swift` (Sparkle `SPUStandardUpdaterController`) |
 | Change window appearance | `AppDelegate.createAndShowMainWindow()` |
 | Change Settings/custom logo logic | `Views/SettingsView.swift` + `Utilities/CustomLogoConstants.swift` |
